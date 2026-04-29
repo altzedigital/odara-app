@@ -142,7 +142,15 @@
     };
 
     window.guardarRegalo = async function() {
-        const idEvento = prompt("Por favor, ingresa tu número de evento (ej. 2001):");
+        // Esto lee el número del link automáticamente
+        const urlParams = new URLSearchParams(window.location.search);
+        let idEvento = urlParams.get('id');
+
+        // Si no viene en el link, se lo pedimos (por si acaso)
+        if(!idEvento) {
+            idEvento = prompt("Por favor, ingresa tu número de evento:");
+        }
+        
         if(!idEvento) return;
 
         const nombre = document.getElementById('nombre-regalo').value;
@@ -153,7 +161,6 @@
         if(!nombre || !precio || !cantidad) return alert("Completa todos los campos.");
 
         try {
-            // Guardamos el regalo dentro de una sub-colección del evento
             await addDoc(collection(db, "eventos", "evento_" + idEvento, "regalos"), {
                 nombre: nombre,
                 foto: foto,
@@ -163,7 +170,8 @@
                 fechaAgregado: new Date()
             });
 
-            alert("¡Regalo añadido con éxito a tu mesa!");
+            alert("¡Regalo '" + nombre + "' añadido con éxito!");
+            document.getElementById('form-personalizado').style.display = 'none';
             document.getElementById('form-personalizado').reset();
         } catch (e) {
             alert("Error al guardar: " + e);
