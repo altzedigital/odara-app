@@ -173,12 +173,15 @@
         });
     }
 
-    // PASO 3: Notificación rápida vía WhatsApp
-    window.confirmarRegalo = (nombreRegalo, id) => {
-        const mensaje = `¡Hola! Me encantaría regalarte "${nombreRegalo}" de tu mesa en Odara. ¿Me podrías compartir los detalles para el depósito?`;
-        const linkWhatsapp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
-        window.open(linkWhatsapp, '_blank');
-    };
+    // SUSTITUYE LA FUNCIÓN ANTERIOR POR ESTA:
+window.confirmarRegalo = (nombreRegalo, precioRegalo) => {
+    // Codificamos los datos para pasarlos por la URL a la página de pago
+    const nombreCodificado = encodeURIComponent(nombreRegalo);
+    const precioCodificado = encodeURIComponent(precioRegalo);
+    
+    // Redirigimos a la nueva página de pago
+    window.location.href = `pago.html?regalo=${nombreCodificado}&monto=${precioCodificado}&id=${idEvento}`;
+};
 
 </script>
 </body>
