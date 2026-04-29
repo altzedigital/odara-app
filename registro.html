@@ -4,88 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Evento - Odara</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
         header { text-align: center; padding: 20px 0; }
-        .logo { font-family: 'Montserrat', sans-serif; font-size: 2rem; color: var(--primario); margin: 0; }
         .form-container { max-width: 450px; margin: 0 auto; background: var(--blanco); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        h2 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-align: center; }
+        h2 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-align: center; font-weight: 600; }
         .input-group { margin-bottom: 20px; text-align: left; }
         label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 600; }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 14px; }
         .btn-crear { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .info-paso { font-size: 0.8rem; color: #888; text-align: center; margin-top: 15px; }
     </style>
+
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // --- REEMPLAZA ESTO CON TUS LLAVES DE FIREBASE ---
-  cconst firebaseConfig = {
-    apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
-    authDomain: "odara-15d63.firebaseapp.com",
-    projectId: "odara-15d63",
-    storageBucket: "odara-15d63.firebasestorage.app",
-    messagingSenderId: "574365543873",
-    appId: "1:574365543873:web:d55ad62b17231e39e89340",
-    measurementId: "G-0LYV3GE6KK"
-  };
-  // -------------------------------------------------
+      const firebaseConfig = {
+        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+        authDomain: "odara-15d63.firebaseapp.com",
+        projectId: "odara-15d63",
+        storageBucket: "odara-15d63.firebasestorage.app",
+        messagingSenderId: "574365543873",
+        appId: "1:574365543873:web:d55ad62b17231e39e89340",
+        measurementId: "G-0LYV3GE6KK"
+      };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-  // Función para crear el evento y generar el número 2001+
-  window.crearEvento = async function() {
-    const nombres = document.getElementById('nombres').value;
-    const bienvenida = document.getElementById('bienvenida').value;
-    const foto = document.getElementById('foto').value;
+      // Esta es la ÚNICA función crearEvento que debe existir
+      window.crearEvento = async function() {
+        const nombres = document.getElementById('nombres').value;
+        const bienvenida = document.getElementById('bienvenida').value;
+        const foto = document.getElementById('foto').value;
 
-    if(!nombres) return alert("Por favor escribe los nombres.");
+        if(!nombres) return alert("Por favor escribe los nombres.");
 
-    try {
-      const contadorRef = doc(db, "configuracion", "contador");
-      
-      // Esta parte hace la suma automática del número de evento
-      await runTransaction(db, async (transaction) => {
-        const contadorDoc = await transaction.get(contadorRef);
-        if (!contadorDoc.exists()) {
-          throw "¡El contador no existe! Revisa el paso de Firestore.";
+        try {
+          const contadorRef = doc(db, "configuracion", "contador");
+          
+          await runTransaction(db, async (transaction) => {
+            const contadorDoc = await transaction.get(contadorRef);
+            if (!contadorDoc.exists()) {
+              throw "¡El contador no existe en Firebase! Crea la colección 'configuracion' y el documento 'contador'.";
+            }
+
+            const nuevoNumero = contadorDoc.data().ultimoEvento + 1;
+            const nuevoEventoID = "evento_" + nuevoNumero;
+
+            transaction.set(doc(db, "eventos", nuevoEventoID), {
+              nombres: nombres,
+              bienvenida: bienvenida,
+              foto: foto,
+              numeroEvento: nuevoNumero,
+              fechaCreacion: new Date()
+            });
+
+            transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
+
+            alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
+          });
+        } catch (e) {
+          console.error("Error detallado: ", e);
+          alert("Error detectado: " + e);
         }
-
-        const nuevoNumero = contadorDoc.data().ultimoEvento + 1;
-        const nuevoEventoID = "evento_" + nuevoNumero;
-
-        // Guardar los datos del nuevo anfitrión
-        transaction.set(doc(db, "eventos", nuevoEventoID), {
-          nombres: nombres,
-          bienvenida: bienvenida,
-          foto: foto,
-          numeroEvento: nuevoNumero,
-          fechaCreacion: new Date()
-        });
-
-        // Actualizar el contador para el siguiente (2002, 2003...)
-        transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
-
-        alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
-      });
-    } catch (e) {
-      console.error("Error detallado: ", e);
-      // Este cambio es clave: nos dirá exactamente qué está fallando
-      alert("Error detectado: " + e);
-    }
-  }
-</script>
+      }
+    </script>
 </head>
 <body>
 
-<header style="text-align: center; padding: 20px 0;">
+<header>
     <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" style="max-width: 200px; height: auto;">
 </header>
-    
+
 <div class="form-container">
     <h2>Crea tu Evento</h2>
     <p style="text-align:center; font-size: 0.85rem;">Completa tus datos para obtener tu número de evento.</p>
@@ -106,21 +99,7 @@
     </div>
 
     <button class="btn-crear" onclick="crearEvento()">Generar mi número de evento</button>
-    
 </div>
-
-<script>
-    function crearEvento() {
-        const nombres = document.getElementById('nombres').value;
-        if(nombres === "") {
-            alert("Por favor, pon tus nombres.");
-            return;
-        }
-        // Nota: En el siguiente paso conectaremos Firebase para que 
-        // este número sea real y se guarde. Por ahora es un ejemplo.
-        alert("¡Felicidades " + nombres + "! Tu evento Odara ha sido reservado. Pronto te daremos tu número oficial.");
-    }
-</script>
 
 </body>
 </html>
