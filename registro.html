@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Anfitrión - Odara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
+        header { text-align: center; padding: 20px 0; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primario); margin: 0; }
+        .form-container { max-width: 450px; margin: 0 auto; background: var(--blanco); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+        .btn-crear { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .info-paso { font-size: 0.8rem; color: #888; text-align: center; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 class="logo">Odara</h1>
+</header>
+
+<div class="form-container">
+    <h2>Crea tu Evento</h2>
+    <p style="text-align:center; font-size: 0.85rem;">Completa tus datos para obtener tu número de evento.</p>
+    
+    <div class="input-group">
+        <label>Nombres de los anfitriones (ej. Ana y Luis)</label>
+        <input type="text" id="nombres" placeholder="Escribe sus nombres...">
+    </div>
+
+    <div class="input-group">
+        <label>Mensaje de bienvenida</label>
+        <textarea id="bienvenida" rows="3" placeholder="Ej: ¡Gracias por acompañarnos!"></textarea>
+    </div>
+
+    <div class="input-group">
+        <label>Link de su foto (URL)</label>
+        <input type="text" id="foto" placeholder="Pega el link de tu foto aquí">
+    </div>
+
+    <button class="btn-crear" onclick="crearEvento()">Generar mi número de evento</button>
+    
+    <p class="info-paso">El número de evento se asignará automáticamente (inicia en 2001).</p>
+</div>
+
+<script>
+    function crearEvento() {
+        const nombres = document.getElementById('nombres').value;
+        if(nombres === "") {
+            alert("Por favor, pon tus nombres.");
+            return;
+        }
+        // Nota: En el siguiente paso conectaremos Firebase para que 
+        // este número sea real y se guarde. Por ahora es un ejemplo.
+        alert("¡Felicidades " + nombres + "! Tu evento Odara ha sido reservado. Pronto te daremos tu número oficial.");
+    }
+</script>
+
+</body>
+</html>
