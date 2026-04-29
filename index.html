@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odara - Mesas de Regalos Inteligentes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
+        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--fondo); color: var(--texto); }
+
+        /* HEADER & NAV */
+        header { 
+            background: var(--blanco); 
+            padding: 15px 5%; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .logo { max-width: 100px; }
+
+        /* MENÚ DESKTOP */
+        nav { display: flex; justify-content: center; margin-top: 15px; gap: 30px; }
+        nav a { text-decoration: none; color: var(--texto); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        nav a:hover { color: var(--primario); }
+
+        /* MENÚ MÓVIL (HAMBURGUESA) */
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; background: none; border: none; }
+        
+        @media (max-width: 768px) {
+            nav { display: none; flex-direction: column; width: 100%; text-align: center; padding: 20px 0; }
+            nav.active { display: flex; }
+            .menu-toggle { display: block; }
+            header { flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
+        }
+
+        /* HERO SECTION */
+        .hero { text-align: center; padding: 80px 20px; max-width: 800px; margin: 0 auto; }
+        .hero h1 { font-size: 2.8rem; color: var(--primario); margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; line-height: 1.6; color: #666; margin-bottom: 40px; }
+
+        /* BUSCADOR DE INVITADOS */
+        .search-box { 
+            background: var(--blanco); 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+        }
+        .search-box h3 { margin-top: 0; font-size: 1rem; }
+        .search-box input { 
+            width: 70%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; 
+        }
+        .btn-buscar { 
+            padding: 12px 20px; background: var(--primario); color: white; border: none; border-radius: 10px; 
+            cursor: pointer; font-weight: bold; 
+        }
+
+        /* BOTÓN PRINCIPAL */
+        .btn-cta { 
+            display: inline-block; background: var(--primario); color: white; padding: 15px 40px; 
+            border-radius: 15px; text-decoration: none; font-weight: bold; margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn-cta:hover { transform: scale(1.05); background: #b08968; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" class="logo">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </div>
+    <nav id="main-nav">
+        <a href="registro.html">Abrir Mesa de Regalos</a>
+        <a href="login.html">Iniciar Sesión</a>
+        <a href="#buscar">Soy Invitado</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Regalos que cuentan historias.</h1>
+    <p>Crea tu mesa de regalos personalizada en minutos. Recibe lo que realmente necesitas y mantén el contacto con tus invitados de forma sencilla y elegante.</p>
+    
+    <div class="search-box" id="buscar">
+        <h3>¿Eres invitado?</h3>
+        <p style="font-size: 0.8rem; color: #999;">Ingresa el código del evento que te compartieron</p>
+        <input type="number" id="codigo-evento" placeholder="Ej: 102">
+        <button class="btn-buscar" onclick="buscarEvento()">Ir</button>
+    </div>
+
+    <br><br>
+    <a href="registro.html" class="btn-cta">Comenzar mi mesa gratis</a>
+</section>
+
+<script>
+    function toggleMenu() {
+        const nav = document.getElementById('main-nav');
+        nav.classList.toggle('active');
+    }
+
+    function buscarEvento() {
+        const id = document.getElementById('codigo-evento').value;
+        if(id) {
+            window.location.href = `evento.html?id=${id}`;
+        } else {
+            alert("Por favor, ingresa un número de evento válido.");
+        }
+    }
+</script>
+
+</body>
+</html>
