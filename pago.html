@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Regalo - Odara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .pago-card { background: var(--blanco); padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        .monto-destacado { font-size: 2rem; color: var(--primario); font-weight: 600; margin: 20px 0; }
+        .instrucciones { background: #f9f9f9; padding: 20px; border-radius: 15px; text-align: left; margin: 20px 0; border: 1px dashed var(--primario); }
+        .btn-finalizar { background: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; text-decoration: none; display: block; }
+        .btn-finalizar:hover { background: #b08968; }
+    </style>
+</head>
+<body>
 
+<div class="pago-card">
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" style="width: 70px; margin-bottom: 20px;">
+    <h2>¡Gracias por tu detalle!</h2>
+    <p>Estás regalando: <br><strong id="nombre-regalo">...</strong></p>
+    
+    <div class="monto-destacado" id="monto-regalo">$0.00</div>
+
+    <div class="instrucciones">
+        <p style="margin-top:0; font-weight: 600;">Datos de Transferencia:</p>
+        <p><strong>Banco:</strong> Mi Banco Ideal</p>
+        <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
+        <p><strong>A nombre de:</strong> Nombre de la Anfitriona</p>
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 0;">* Una vez realizada la transferencia, el anfitrión recibirá una notificación.</p>
+    </div>
+
+    <button class="btn-finalizar" onclick="notificarPago()">Ya realicé el pago</button>
+    <a href="javascript:history.back()" style="display:block; margin-top:15px; font-size: 0.8rem; color: #999; text-decoration: none;">Volver atrás</a>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const regalo = params.get('regalo');
+    const monto = params.get('monto');
+
+    document.getElementById('nombre-regalo').innerText = regalo;
+    document.getElementById('monto-regalo').innerText = `$${monto}`;
+
+    function notificarPago() {
+        alert("¡Gracias! Hemos registrado tu intención de regalo. El anfitrión validará la transferencia pronto.");
+        window.location.href = "index.html"; // O mandarlos de vuelta a la mesa
+    }
+</script>
+
+</body>
+</html>
