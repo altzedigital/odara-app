@@ -62,10 +62,14 @@
               fechaCreacion: new Date()
             });
 
-            transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
+            // Actualizar el contador para el siguiente
+        transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
 
-            alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
-          });
+        alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
+        
+        // ESTO ES LO NUEVO: Mandarlos al panel con su número en el link
+        window.location.href = "panel.html?id=" + nuevoNumero;
+      });
         } catch (e) {
           console.error("Error detallado: ", e);
           alert("Error detectado: " + e);
