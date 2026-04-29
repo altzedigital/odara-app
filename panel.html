@@ -95,29 +95,90 @@
     </div>
 </div>
 
-<script>
-    function mostrarFormulario() {
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+        authDomain: "odara-15d63.firebaseapp.com",
+        projectId: "odara-15d63",
+        storageBucket: "odara-15d63.firebasestorage.app",
+        messagingSenderId: "574365543873",
+        appId: "1:574365543873:web:d55ad62b17231e39e89340",
+        measurementId: "G-0LYV3GE6KK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Lista de Recomendaciones (Cocina y Experiencias)
+    const recomendaciones = [
+        { nombre: "Set de Vajilla Cerámica", precio: 1800, foto: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=400" },
+        { nombre: "Cubertería Oro Mate", precio: 1200, foto: "https://images.unsplash.com/photo-1591872202319-33c79b76b928?q=80&w=400" },
+        { nombre: "Copas de Cristal (6 pzas)", precio: 950, foto: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=400" },
+        { nombre: "Cena Romántica", precio: 2500, foto: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=400" },
+        { nombre: "Salto en Paracaídas", precio: 4500, foto: "https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=400" }
+    ];
+
+    // Cargar recomendaciones al iniciar
+    const grid = document.querySelector('.grid-catalogo');
+    recomendaciones.forEach(item => {
+        grid.innerHTML += `
+            <div class="item-regalo">
+                <img src="${item.foto}" alt="${item.nombre}">
+                <h4>${item.nombre}</h4>
+                <p>Sugerido: $${item.precio}</p>
+                <button onclick="prellenarFormulario('${item.nombre}', ${item.precio}, '${item.foto}')" class="btn-guardar" style="padding: 8px; font-size: 0.8rem;">Elegir este</button>
+            </div>
+        `;
+    });
+
+    window.prellenarFormulario = function(nombre, precio, foto) {
+        document.getElementById('nombre-regalo').value = nombre;
+        document.getElementById('precio-regalo').value = precio;
+        document.getElementById('foto-regalo').value = foto;
+        window.mostrarFormulario();
+    };
+
+    window.guardarRegalo = async function() {
+        const idEvento = prompt("Por favor, ingresa tu número de evento (ej. 2001):");
+        if(!idEvento) return;
+
+        const nombre = document.getElementById('nombre-regalo').value;
+        const foto = document.getElementById('foto-regalo').value;
+        const precio = Number(document.getElementById('precio-regalo').value);
+        const cantidad = Number(document.getElementById('cantidad-regalo').value);
+
+        if(!nombre || !precio || !cantidad) return alert("Completa todos los campos.");
+
+        try {
+            // Guardamos el regalo dentro de una sub-colección del evento
+            await addDoc(collection(db, "eventos", "evento_" + idEvento, "regalos"), {
+                nombre: nombre,
+                foto: foto,
+                precio: precio,
+                cantidadTotal: cantidad,
+                cantidadComprada: 0,
+                fechaAgregado: new Date()
+            });
+
+            alert("¡Regalo añadido con éxito a tu mesa!");
+            document.getElementById('form-personalizado').reset();
+        } catch (e) {
+            alert("Error al guardar: " + e);
+        }
+    };
+
+    // Funciones de visibilidad
+    window.mostrarFormulario = () => {
         document.getElementById('form-personalizado').style.display = 'block';
         document.getElementById('seccion-recomendaciones').style.display = 'none';
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function mostrarRecomendaciones() {
+    };
+    window.mostrarRecomendaciones = () => {
         document.getElementById('seccion-recomendaciones').style.display = 'block';
         document.getElementById('form-personalizado').style.display = 'none';
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-    function guardarRegalo() {
-        const nombre = document.getElementById('nombre-regalo').value;
-        const cantidad = document.getElementById('cantidad-regalo').value;
-        const precio = document.getElementById('precio-regalo').value;
-
-        if(!nombre || !cantidad || !precio) return alert("Por favor completa todos los campos.");
-
-        alert("¡Listo! Has añadido " + cantidad + " unidades de '" + nombre + "' a tu mesa.");
-        // Aquí conectaremos Firestore en el siguiente paso para guardar esto bajo el ID 2001
-    }
+    };
 </script>
 
 </body>
