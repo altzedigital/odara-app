@@ -171,8 +171,17 @@
             });
 
             alert("¡Regalo '" + nombre + "' añadido con éxito!");
+            
+            // --- ESTA ES LA CORRECCIÓN ---
+            // En lugar de .reset(), limpiamos manualmente cada cajita:
+            document.getElementById('nombre-regalo').value = "";
+            document.getElementById('foto-regalo').value = "";
+            document.getElementById('precio-regalo').value = "";
+            document.getElementById('cantidad-regalo').value = "";
+            
+            // Ocultamos el formulario para que el usuario vea el éxito
             document.getElementById('form-personalizado').style.display = 'none';
-            document.getElementById('form-personalizado').reset();
+            
         } catch (e) {
             alert("Error al guardar: " + e);
         }
