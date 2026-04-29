@@ -17,7 +17,6 @@
         h1 { font-weight: 600; color: var(--dorado-oscuro); margin-bottom: 5px; }
         .welcome-text { font-size: 1.1rem; margin-bottom: 25px; color: #666; }
 
-        /* SECCIÓN PERSONALIZACIÓN */
         .card-personalizacion { background: var(--blanco); padding: 20px; border-radius: 20px; margin-bottom: 20px; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .galeria-portadas { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: thin; }
         .img-portada-opcion { width: 100px; height: 70px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: 0.3s; flex-shrink: 0; }
@@ -58,12 +57,11 @@
     <div class="card-personalizacion">
         <h3 style="margin-top:0; color:var(--dorado-oscuro);">✨ Estilo de tu Mesa</h3>
         <label>1. Elige una foto de portada</label>
-        <div class="galeria-portadas" id="galeria-portadas">
-            </div>
+        <div class="galeria-portadas" id="galeria-portadas"></div>
         
         <div class="input-group" style="margin-top:15px;">
             <label>2. Tu mensaje de bienvenida</label>
-            <textarea id="mensaje-bienvenida" rows="2" placeholder="Ej: ¡Bienvenidos a nuestro Baby Shower! Gracias por ser parte de este momento."></textarea>
+            <textarea id="mensaje-bienvenida" rows="2" placeholder="Ej: ¡Bienvenidos a nuestro Baby Shower!"></textarea>
         </div>
         <button class="btn-guardar" onclick="guardarConfiguracion()" style="margin-top:0; padding:10px;">Guardar Estilo</button>
     </div>
@@ -142,7 +140,6 @@
     let idEventoGlobal = null;
     let portadaElegida = "";
 
-    // Imágenes proporcionadas por Gemini para el anfitrión
     const portadasDisponibles = [
         "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=500",
         "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=500",
@@ -151,7 +148,6 @@
         "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500"
     ];
 
-    // Cargar galería de portadas
     const contenedorPortadas = document.getElementById('galeria-portadas');
     portadasDisponibles.forEach(url => {
         const img = document.createElement('img');
@@ -179,12 +175,14 @@
                 document.getElementById('mensaje-bienvenida').value = datos.bienvenida || "";
                 portadaElegida = datos.foto || "";
                 
-                // Marcar portada actual como seleccionada
                 document.querySelectorAll('.img-portada-opcion').forEach(img => {
                     if(img.src === portadaElegida) img.classList.add('seleccionada');
                 });
 
-                document.getElementById('link-display').innerText = `https://odara-15d63.web.app/evento.html?id=${idEventoGlobal}`;
+                // AJUSTE AQUÍ: Generar link dinámico
+                const baseUrl = window.location.origin + window.location.pathname.replace('panel.html', '');
+                document.getElementById('link-display').innerText = `${baseUrl}evento.html?id=${idEventoGlobal}`;
+                
                 cargarMisRegalos();
             }
         } else {
@@ -196,11 +194,8 @@
         const msg = document.getElementById('mensaje-bienvenida').value;
         try {
             const eventoRef = doc(db, "eventos", "evento_" + idEventoGlobal);
-            await updateDoc(eventoRef, {
-                bienvenida: msg,
-                foto: portadaElegida
-            });
-            alert("¡Estilo actualizado con éxito!");
+            await updateDoc(eventoRef, { bienvenida: msg, foto: portadaElegida });
+            alert("¡Estilo actualizado!");
         } catch (e) { alert("Error al guardar."); }
     };
 
