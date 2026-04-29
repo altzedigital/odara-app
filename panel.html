@@ -17,7 +17,12 @@
         h1 { font-weight: 600; color: var(--dorado-oscuro); margin-bottom: 5px; }
         .welcome-text { font-size: 1.1rem; margin-bottom: 25px; color: #666; }
 
-        /* Banner para compartir link */
+        /* SECCIÓN PERSONALIZACIÓN */
+        .card-personalizacion { background: var(--blanco); padding: 20px; border-radius: 20px; margin-bottom: 20px; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .galeria-portadas { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: thin; }
+        .img-portada-opcion { width: 100px; height: 70px; object-fit: cover; border-radius: 10px; cursor: pointer; border: 3px solid transparent; transition: 0.3s; flex-shrink: 0; }
+        .img-portada-opcion.seleccionada { border-color: var(--primario); transform: scale(1.05); }
+
         .share-banner { background: var(--primario); color: white; padding: 20px; border-radius: 20px; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; box-shadow: 0 5px 15px rgba(212, 163, 115, 0.3); }
         .btn-share { background: white; color: var(--primario); border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
 
@@ -25,20 +30,17 @@
         .card-btn { background: var(--blanco); padding: 30px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .card-btn:hover { border-color: var(--primario); transform: translateY(-3px); }
         .card-btn h3 { margin: 10px 0; color: var(--primario); font-size: 1rem; }
-        .card-btn p { font-size: 0.8rem; color: #777; margin: 0; }
-
-        #form-personalizado { display: none; background: var(--blanco); padding: 30px; border-radius: 20px; margin-top: 20px; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        #form-personalizado, #seccion-recomendaciones { display: none; background: var(--blanco); padding: 30px; border-radius: 20px; margin-top: 20px; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 15px; }
         label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
         
         .btn-guardar { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        #seccion-recomendaciones { display: none; margin-top: 30px; }
         .grid-catalogo { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-        .item-regalo { background: var(--blanco); padding: 15px; border-radius: 15px; text-align: center; }
+        .item-regalo { background: var(--fondo); padding: 15px; border-radius: 15px; text-align: center; }
         .item-regalo img { width: 100%; border-radius: 10px; height: 130px; object-fit: cover; }
-
         .regalo-gestion { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; }
     </style>
 </head>
@@ -51,7 +53,20 @@
 
 <div class="container">
     <h1 id="user-greeting">¡Bienvenida!</h1>
-    <p class="welcome-text">Estamos preparando todo para tu gran día.</p>
+    <p class="welcome-text">Personaliza tu mesa y gestiona tus regalos.</p>
+
+    <div class="card-personalizacion">
+        <h3 style="margin-top:0; color:var(--dorado-oscuro);">✨ Estilo de tu Mesa</h3>
+        <label>1. Elige una foto de portada</label>
+        <div class="galeria-portadas" id="galeria-portadas">
+            </div>
+        
+        <div class="input-group" style="margin-top:15px;">
+            <label>2. Tu mensaje de bienvenida</label>
+            <textarea id="mensaje-bienvenida" rows="2" placeholder="Ej: ¡Bienvenidos a nuestro Baby Shower! Gracias por ser parte de este momento."></textarea>
+        </div>
+        <button class="btn-guardar" onclick="guardarConfiguracion()" style="margin-top:0; padding:10px;">Guardar Estilo</button>
+    </div>
 
     <div class="share-banner">
         <span style="font-size: 0.9rem;">Link para tus invitados:</span>
@@ -66,24 +81,22 @@
         </div>
     </div>
 
-    <p style="font-weight: 600;">¿Qué quieres añadir hoy?</p>
-
     <div class="opciones-principales">
         <div class="card-btn" onclick="mostrarFormulario()">
-            <h3>✨ Crear Regalo</h3>
-            <p>Personaliza fotos y precios.</p>
+            <h3>🎁 Crear Regalo</h3>
+            <p>Sube algo específico.</p>
         </div>
         <div class="card-btn" onclick="mostrarRecomendaciones()">
-            <h3>🎁 Sugerencias</h3>
-            <p>Ideas curadas por Odara.</p>
+            <h3>⭐ Sugerencias</h3>
+            <p>Ideas de Odara.</p>
         </div>
     </div>
 
     <div id="form-personalizado">
-        <h3>Agregar Regalo</h3>
+        <h3>Agregar Nuevo Regalo</h3>
         <div class="input-group">
             <label>Nombre del Regalo</label>
-            <input type="text" id="nombre-regalo" placeholder="Ej: Cena Romántica">
+            <input type="text" id="nombre-regalo" placeholder="Ej: Carriola de Paseo">
         </div>
         <div class="input-group">
             <label>Link de la Imagen (URL)</label>
@@ -96,14 +109,14 @@
             </div>
             <div style="flex: 1;">
                 <label>Cantidad</label>
-                <input type="number" id="cantidad-regalo" placeholder="1">
+                <input type="number" id="cantidad-regalo" value="1">
             </div>
         </div>
         <button class="btn-guardar" onclick="guardarRegalo()">Añadir a mi mesa</button>
     </div>
 
     <div id="seccion-recomendaciones">
-        <h3>Sugerencias Odara</h3>
+        <h3 style="margin-top:0;">Catálogo Odara</h3>
         <div class="grid-catalogo" id="grid-recomendaciones"></div>
     </div>
 </div>
@@ -111,7 +124,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
@@ -127,11 +140,33 @@
     const db = getFirestore(app);
 
     let idEventoGlobal = null;
+    let portadaElegida = "";
 
-    // 1. SEGURIDAD: Verificar sesión activa
+    // Imágenes proporcionadas por Gemini para el anfitrión
+    const portadasDisponibles = [
+        "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=500",
+        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=500",
+        "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500",
+        "https://images.unsplash.com/photo-1550005816-09246d37738c?w=500",
+        "https://images.unsplash.com/photo-1522673607200-1648832cee98?w=500"
+    ];
+
+    // Cargar galería de portadas
+    const contenedorPortadas = document.getElementById('galeria-portadas');
+    portadasDisponibles.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'img-portada-opcion';
+        img.onclick = () => {
+            portadaElegida = url;
+            document.querySelectorAll('.img-portada-opcion').forEach(i => i.classList.remove('seleccionada'));
+            img.classList.add('seleccionada');
+        };
+        contenedorPortadas.appendChild(img);
+    });
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Buscar el evento de este usuario por su UID
             const q = query(collection(db, "eventos"), where("uid", "==", user.uid));
             const querySnapshot = await getDocs(q);
             
@@ -140,42 +175,48 @@
                 const datos = eventoDoc.data();
                 idEventoGlobal = datos.numeroEvento;
 
-                // Personalizar UI
                 document.getElementById('user-greeting').innerText = `¡Hola, ${datos.nombres}!`;
-                const linkInvitados = `https://odara-15d63.web.app/evento.html?id=${idEventoGlobal}`; // Ajusta a tu URL real
-                document.getElementById('link-display').innerText = linkInvitados;
+                document.getElementById('mensaje-bienvenida').value = datos.bienvenida || "";
+                portadaElegida = datos.foto || "";
                 
+                // Marcar portada actual como seleccionada
+                document.querySelectorAll('.img-portada-opcion').forEach(img => {
+                    if(img.src === portadaElegida) img.classList.add('seleccionada');
+                });
+
+                document.getElementById('link-display').innerText = `https://odara-15d63.web.app/evento.html?id=${idEventoGlobal}`;
                 cargarMisRegalos();
-            } else {
-                alert("No tienes un evento asignado.");
             }
         } else {
-            // No logueado -> Al login
             window.location.href = "login.html";
         }
     });
 
-    // CERRAR SESIÓN
-    window.cerrarSesion = () => {
-        signOut(auth).then(() => window.location.href = "login.html");
+    window.guardarConfiguracion = async function() {
+        const msg = document.getElementById('mensaje-bienvenida').value;
+        try {
+            const eventoRef = doc(db, "eventos", "evento_" + idEventoGlobal);
+            await updateDoc(eventoRef, {
+                bienvenida: msg,
+                foto: portadaElegida
+            });
+            alert("¡Estilo actualizado con éxito!");
+        } catch (e) { alert("Error al guardar."); }
     };
 
-    // COPIAR LINK
+    window.cerrarSesion = () => signOut(auth).then(() => window.location.href = "login.html");
+
     window.copiarLink = () => {
-        const link = document.getElementById('link-display').innerText;
-        navigator.clipboard.writeText(link);
-        alert("¡Link copiado! Ya puedes pegarlo en WhatsApp para tus invitados.");
+        navigator.clipboard.writeText(document.getElementById('link-display').innerText);
+        alert("¡Link copiado!");
     };
 
-    // CARGAR REGALOS
     async function cargarMisRegalos() {
         const contenedor = document.getElementById('mis-regalos-lista');
         const regalosRef = collection(db, "eventos", "evento_" + idEventoGlobal, "regalos");
         const q = query(regalosRef, orderBy("fechaAgregado", "desc"));
         const querySnapshot = await getDocs(q);
-        
-        contenedor.innerHTML = querySnapshot.empty ? "<p>No has añadido regalos aún.</p>" : "";
-        
+        contenedor.innerHTML = querySnapshot.empty ? "<p>No has añadido regalos.</p>" : "";
         querySnapshot.forEach((documento) => {
             const regalo = documento.data();
             contenedor.innerHTML += `
@@ -187,14 +228,14 @@
                             <span style="font-size:0.75rem; color:var(--primario)">$${regalo.precio} | Cant: ${regalo.cantidadTotal}</span>
                         </div>
                     </div>
-                    <button onclick="eliminarRegalo('${documento.id}')" style="background:none; border:none; color:red; cursor:pointer; font-size:0.8rem;">Eliminar</button>
+                    <button onclick="eliminarRegalo('${documento.id}')" style="background:none; border:none; color:red; cursor:pointer;">Eliminar</button>
                 </div>
             `;
         });
     }
 
     window.eliminarRegalo = async function(docId) {
-        if(confirm("¿Borrar este regalo?")) {
+        if(confirm("¿Borrar?")) {
             await deleteDoc(doc(db, "eventos", "evento_" + idEventoGlobal, "regalos", docId));
             cargarMisRegalos();
         }
@@ -205,29 +246,20 @@
         const foto = document.getElementById('foto-regalo').value;
         const precio = Number(document.getElementById('precio-regalo').value);
         const cantidad = Number(document.getElementById('cantidad-regalo').value);
-
-        if(!nombre || !precio) return alert("Completa los datos mínimos.");
-
+        if(!nombre || !precio) return alert("Completa los datos.");
         try {
             await addDoc(collection(db, "eventos", "evento_" + idEventoGlobal, "regalos"), {
-                nombre: nombre, foto: foto, precio: precio,
-                cantidadTotal: cantidad, cantidadComprada: 0,
-                fechaAgregado: new Date()
+                nombre, foto, precio, cantidadTotal: cantidad, cantidadComprada: 0, fechaAgregado: new Date()
             });
             alert("¡Añadido!");
-            document.getElementById('nombre-regalo').value = "";
-            document.getElementById('foto-regalo').value = "";
-            document.getElementById('precio-regalo').value = "";
-            document.getElementById('cantidad-regalo').value = "";
             cargarMisRegalos();
-        } catch (e) { alert("Error al guardar."); }
+        } catch (e) { alert("Error."); }
     };
 
-    // RECOMENDACIONES (DATOS)
     const recomendaciones = [
-        { nombre: "Set Vajilla Cerámica", precio: 1800, foto: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=400" },
-        { nombre: "Cubertería Oro Mate", precio: 1200, foto: "https://images.unsplash.com/photo-1591872202319-33c79b76b928?q=80&w=400" },
-        { nombre: "Cena Romántica", precio: 2500, foto: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=400" }
+        { nombre: "Vajilla Nórdica", precio: 2200, foto: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400" },
+        { nombre: "Cena Degustación", precio: 3500, foto: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400" },
+        { nombre: "Set de Copas Cristal", precio: 1500, foto: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400" }
     ];
 
     const grid = document.getElementById('grid-recomendaciones');
@@ -235,8 +267,8 @@
         grid.innerHTML += `
             <div class="item-regalo">
                 <img src="${item.foto}">
-                <h4 style="font-size:0.85rem; margin:10px 0 5px 0;">${item.nombre}</h4>
-                <p style="font-size:0.8rem; color:var(--primario); margin-bottom:10px;">$${item.precio}</p>
+                <h4 style="font-size:0.85rem;">${item.nombre}</h4>
+                <p style="color:var(--primario);">$${item.precio}</p>
                 <button onclick="prellenarFormulario('${item.nombre}', ${item.precio}, '${item.foto}')" class="btn-guardar" style="padding:6px; font-size:0.75rem;">Elegir</button>
             </div>
         `;
