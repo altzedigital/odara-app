@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Odara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--blanco); padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; }
+        .btn { width: 100%; background: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .links { margin-top: 15px; font-size: 0.8rem; }
+        a { color: var(--primario); text-decoration: none; margin: 0 5px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara" style="max-width: 120px; margin-bottom: 20px;">
+    <h2>Entrar a mi Panel</h2>
+    <input type="email" id="email" placeholder="Correo electrónico">
+    <input type="password" id="pass" placeholder="Contraseña">
+    <button class="btn" onclick="entrar()">Entrar</button>
+    
+    <div class="links">
+        <a href="#" onclick="recuperar()">Olvidé mi contraseña</a> | 
+        <a href="registro.html">Crear cuenta</a>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+        authDomain: "odara-15d63.firebaseapp.com",
+        projectId: "odara-15d63",
+        storageBucket: "odara-15d63.firebasestorage.app",
+        messagingSenderId: "574365543873",
+        appId: "1:574365543873:web:d55ad62b17231e39e89340"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.entrar = async function() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+            const user = userCredential.user;
+
+            // Buscar qué número de evento le toca a este usuario
+            const q = query(collection(db, "eventos"), where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const eventoData = querySnapshot.docs[0].data();
+                window.location.href = "panel.html?id=" + eventoData.numeroEvento;
+            } else {
+                alert("No encontramos un evento asociado a tu cuenta.");
+            }
+        } catch (error) {
+            alert("Datos incorrectos o usuario no encontrado.");
+        }
+    }
+
+    window.recuperar = async function() {
+        const email = prompt("Escribe tu correo para enviarte el enlace de recuperación:");
+        if (email) {
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Te hemos enviado un correo para cambiar tu contraseña. Revisa tu bandeja (o spam).");
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+    }
+</script>
+</body>
+</html>
