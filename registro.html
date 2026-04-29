@@ -3,107 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Evento - Odara</title>
+    <title>Registro Odara</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
-        header { text-align: center; padding: 20px 0; }
-        .form-container { max-width: 450px; margin: 0 auto; background: var(--blanco); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        h2 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-align: center; font-weight: 600; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 600; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; font-family: 'Montserrat', sans-serif; font-size: 14px; }
-        .btn-crear { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: var(--blanco); padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; }
+        .btn { width: 100%; background: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        a { color: var(--primario); text-decoration: none; font-size: 0.8rem; }
     </style>
+</head>
+<body>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<div class="card">
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara" style="max-width: 150px; margin-bottom: 20px;">
+    <h2>Crea tu cuenta</h2>
+    <input type="text" id="nombres" placeholder="Nombres de los anfitriones">
+    <input type="date" id="fechaEvento">
+    <input type="email" id="email" placeholder="Tu correo electrónico">
+    <input type="password" id="password" placeholder="Crea una contraseña">
+    <button class="btn" onclick="registrar()">Empezar mi mesa</button>
+    <p><a href="login.html">¿Ya tienes cuenta? Inicia sesión</a></p>
+</div>
 
-      const firebaseConfig = {
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
         apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
         authDomain: "odara-15d63.firebaseapp.com",
         projectId: "odara-15d63",
         storageBucket: "odara-15d63.firebasestorage.app",
         messagingSenderId: "574365543873",
-        appId: "1:574365543873:web:d55ad62b17231e39e89340",
-        measurementId: "G-0LYV3GE6KK"
-      };
+        appId: "1:574365543873:web:d55ad62b17231e39e89340"
+    };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      // Esta es la ÚNICA función crearEvento que debe existir
-      window.crearEvento = async function() {
+    window.registrar = async function() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
         const nombres = document.getElementById('nombres').value;
-        const bienvenida = document.getElementById('bienvenida').value;
-        const foto = document.getElementById('foto').value;
+        const fecha = document.getElementById('fechaEvento').value;
 
-        if(!nombres) return alert("Por favor escribe los nombres.");
+        if(!email || !pass || !nombres) return alert("Por favor llena todos los campos.");
 
         try {
-          const contadorRef = doc(db, "configuracion", "contador");
-          
-          await runTransaction(db, async (transaction) => {
-            const contadorDoc = await transaction.get(contadorRef);
-            if (!contadorDoc.exists()) {
-              throw "¡El contador no existe en Firebase! Crea la colección 'configuracion' y el documento 'contador'.";
-            }
+            // 1. Crear el usuario en Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            const user = userCredential.user;
 
-            const nuevoNumero = contadorDoc.data().ultimoEvento + 1;
-            const nuevoEventoID = "evento_" + nuevoNumero;
+            // 2. Obtener el siguiente número de evento (2001, 2002...)
+            const contadorRef = doc(db, "configuracion", "contador");
+            let nuevoNumero;
 
-            transaction.set(doc(db, "eventos", nuevoEventoID), {
-              nombres: nombres,
-              bienvenida: bienvenida,
-              foto: foto,
-              numeroEvento: nuevoNumero,
-              fechaCreacion: new Date()
+            await runTransaction(db, async (transaction) => {
+                const contadorDoc = await transaction.get(contadorRef);
+                nuevoNumero = contadorDoc.data().ultimoEvento + 1;
+                
+                // 3. Guardar datos en Firestore usando el UID del usuario
+                transaction.set(doc(db, "eventos", "evento_" + nuevoNumero), {
+                    nombres: nombres,
+                    fechaEvento: fecha,
+                    email: email,
+                    uid: user.uid,
+                    numeroEvento: nuevoNumero,
+                    bienvenida: "¡Bienvenidos a nuestra mesa!",
+                    foto: ""
+                });
+                transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
             });
 
-            // Actualizar el contador para el siguiente
-        transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
+            alert("¡Cuenta creada! Tu número de evento es: " + nuevoNumero);
+            window.location.href = "panel.html?id=" + nuevoNumero;
 
-        alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
-        
-        // ESTO ES LO NUEVO: Mandarlos al panel con su número en el link
-        window.location.href = "panel.html?id=" + nuevoNumero;
-      });
-        } catch (e) {
-          console.error("Error detallado: ", e);
-          alert("Error detectado: " + e);
+        } catch (error) {
+            alert("Error: " + error.message);
         }
-      }
-    </script>
-</head>
-<body>
-
-<header>
-    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" style="max-width: 200px; height: auto;">
-</header>
-
-<div class="form-container">
-    <h2>Crea tu Evento</h2>
-    <p style="text-align:center; font-size: 0.85rem;">Completa tus datos para obtener tu número de evento.</p>
-    
-    <div class="input-group">
-        <label>Nombres de los anfitriones (ej. Ana y Luis)</label>
-        <input type="text" id="nombres" placeholder="Escribe sus nombres...">
-    </div>
-
-    <div class="input-group">
-        <label>Mensaje de bienvenida</label>
-        <textarea id="bienvenida" rows="3" placeholder="Ej: ¡Gracias por acompañarnos!"></textarea>
-    </div>
-
-    <div class="input-group">
-        <label>Link de su foto (URL)</label>
-        <input type="text" id="foto" placeholder="Pega el link de tu foto aquí">
-    </div>
-
-    <button class="btn-crear" onclick="crearEvento()">Generar mi número de evento</button>
-</div>
-
+    }
+</script>
 </body>
 </html>
