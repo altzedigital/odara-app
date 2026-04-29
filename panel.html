@@ -97,7 +97,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
@@ -112,82 +112,105 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Lista de Recomendaciones (Cocina y Experiencias)
+    // Obtener ID del evento de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let idEvento = urlParams.get('id');
+
+    // --- CARGAR MIS REGALOS ACTUALES ---
+    async function cargarMisRegalos() {
+        if(!idEvento) return;
+        const contenedor = document.getElementById('mis-regalos-lista');
+        if(!contenedor) return;
+
+        contenedor.innerHTML = "<p>Cargando tus regalos...</p>";
+        
+        const regalosRef = collection(db, "eventos", "evento_" + idEvento, "regalos");
+        const q = query(regalosRef, orderBy("fechaAgregado", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        contenedor.innerHTML = "";
+        
+        querySnapshot.forEach((documento) => {
+            const regalo = documento.data();
+            contenedor.innerHTML += `
+                <div class="item-regalo" style="border: 1px solid #ddd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; padding:10px;">
+                    <div style="display:flex; align-items:center;">
+                        <img src="${regalo.foto}" style="width:50px; height:50px; object-fit:cover; border-radius:5px; margin-right:15px;">
+                        <div>
+                            <strong>${regalo.nombre}</strong><br>
+                            <span style="font-size:0.8rem; color:var(--primario)">$${regalo.precio} | Stock: ${regalo.cantidadTotal}</span>
+                        </div>
+                    </div>
+                    <button onclick="eliminarRegalo('${documento.id}')" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">✕ Eliminar</button>
+                </div>
+            `;
+        });
+    }
+
+    window.eliminarRegalo = async function(docId) {
+        if(confirm("¿Estás segura de que quieres eliminar este regalo?")) {
+            await deleteDoc(doc(db, "eventos", "evento_" + idEvento, "regalos", docId));
+            alert("Regalo eliminado.");
+            cargarMisRegalos(); // Refrescar lista
+        }
+    };
+
+    window.guardarRegalo = async function() {
+        if(!idEvento) idEvento = prompt("Número de evento:");
+        
+        const nombre = document.getElementById('nombre-regalo').value;
+        const foto = document.getElementById('foto-regalo').value;
+        const precio = Number(document.getElementById('precio-regalo').value);
+        const cantidad = Number(document.getElementById('cantidad-regalo').value);
+
+        if(!nombre || !precio || !cantidad) return alert("Completa los campos.");
+
+        try {
+            await addDoc(collection(db, "eventos", "evento_" + idEvento, "regalos"), {
+                nombre: nombre, foto: foto, precio: precio,
+                cantidadTotal: cantidad, cantidadComprada: 0,
+                fechaAgregado: new Date()
+            });
+
+            alert("Añadido con éxito.");
+            document.getElementById('nombre-regalo').value = "";
+            document.getElementById('foto-regalo').value = "";
+            document.getElementById('precio-regalo').value = "";
+            document.getElementById('cantidad-regalo').value = "";
+            
+            cargarMisRegalos(); // Refrescar lista automáticamente
+        } catch (e) { alert("Error: " + e); }
+    };
+
+    // Al cargar la página, mostramos los regalos existentes
+    cargarMisRegalos();
+
+    // Lógica de navegación y catálogo (se mantiene igual)
     const recomendaciones = [
         { nombre: "Set de Vajilla Cerámica", precio: 1800, foto: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=400" },
         { nombre: "Cubertería Oro Mate", precio: 1200, foto: "https://images.unsplash.com/photo-1591872202319-33c79b76b928?q=80&w=400" },
-        { nombre: "Copas de Cristal (6 pzas)", precio: 950, foto: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=400" },
-        { nombre: "Cena Romántica", precio: 2500, foto: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=400" },
-        { nombre: "Salto en Paracaídas", precio: 4500, foto: "https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=400" }
+        { nombre: "Cena Romántica", precio: 2500, foto: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=400" }
     ];
 
-    // Cargar recomendaciones al iniciar
     const grid = document.querySelector('.grid-catalogo');
     recomendaciones.forEach(item => {
         grid.innerHTML += `
             <div class="item-regalo">
                 <img src="${item.foto}" alt="${item.nombre}">
                 <h4>${item.nombre}</h4>
-                <p>Sugerido: $${item.precio}</p>
-                <button onclick="prellenarFormulario('${item.nombre}', ${item.precio}, '${item.foto}')" class="btn-guardar" style="padding: 8px; font-size: 0.8rem;">Elegir este</button>
+                <p>$${item.precio}</p>
+                <button onclick="prellenarFormulario('${item.nombre}', ${item.precio}, '${item.foto}')" class="btn-guardar">Elegir este</button>
             </div>
         `;
     });
 
-    window.prellenarFormulario = function(nombre, precio, foto) {
+    window.prellenarFormulario = (nombre, precio, foto) => {
         document.getElementById('nombre-regalo').value = nombre;
         document.getElementById('precio-regalo').value = precio;
         document.getElementById('foto-regalo').value = foto;
         window.mostrarFormulario();
     };
 
-    window.guardarRegalo = async function() {
-        // Esto lee el número del link automáticamente
-        const urlParams = new URLSearchParams(window.location.search);
-        let idEvento = urlParams.get('id');
-
-        // Si no viene en el link, se lo pedimos (por si acaso)
-        if(!idEvento) {
-            idEvento = prompt("Por favor, ingresa tu número de evento:");
-        }
-        
-        if(!idEvento) return;
-
-        const nombre = document.getElementById('nombre-regalo').value;
-        const foto = document.getElementById('foto-regalo').value;
-        const precio = Number(document.getElementById('precio-regalo').value);
-        const cantidad = Number(document.getElementById('cantidad-regalo').value);
-
-        if(!nombre || !precio || !cantidad) return alert("Completa todos los campos.");
-
-        try {
-            await addDoc(collection(db, "eventos", "evento_" + idEvento, "regalos"), {
-                nombre: nombre,
-                foto: foto,
-                precio: precio,
-                cantidadTotal: cantidad,
-                cantidadComprada: 0,
-                fechaAgregado: new Date()
-            });
-
-            alert("¡Regalo '" + nombre + "' añadido con éxito!");
-            
-            // --- ESTA ES LA CORRECCIÓN ---
-            // En lugar de .reset(), limpiamos manualmente cada cajita:
-            document.getElementById('nombre-regalo').value = "";
-            document.getElementById('foto-regalo').value = "";
-            document.getElementById('precio-regalo').value = "";
-            document.getElementById('cantidad-regalo').value = "";
-            
-            // Ocultamos el formulario para que el usuario vea el éxito
-            document.getElementById('form-personalizado').style.display = 'none';
-            
-        } catch (e) {
-            alert("Error al guardar: " + e);
-        }
-    };
-
-    // Funciones de visibilidad
     window.mostrarFormulario = () => {
         document.getElementById('form-personalizado').style.display = 'block';
         document.getElementById('seccion-recomendaciones').style.display = 'none';
@@ -197,6 +220,5 @@
         document.getElementById('form-personalizado').style.display = 'none';
     };
 </script>
-
 </body>
 </html>
