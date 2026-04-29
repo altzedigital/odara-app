@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Anfitrión - Odara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; --dorado-oscuro: #b08968; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 20px; }
+        
+        header { text-align: center; padding: 10px 0; }
+        .logo-small { max-width: 120px; height: auto; }
+
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        h1 { font-weight: 600; color: var(--dorado-oscuro); }
+
+        /* Estilo de los dos botones principales */
+        .opciones-principales { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
+        .card-btn { background: var(--blanco); padding: 40px 20px; border-radius: 20px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .card-btn:hover { border-color: var(--primario); transform: translateY(-5px); }
+        .card-btn i { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .card-btn h3 { margin: 10px 0; color: var(--primario); }
+        .card-btn p { font-size: 0.85rem; color: #777; }
+
+        /* Formulario para crear regalo propio */
+        #form-personalizado { display: none; background: var(--blanco); padding: 30px; border-radius: 20px; margin-top: 20px; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 15px; }
+        label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #e9edc9; border-radius: 10px; box-sizing: border-box; }
+        
+        .btn-guardar { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        /* Sección de Recomendaciones (Catálogo) */
+        #seccion-recomendaciones { display: none; margin-top: 30px; }
+        .grid-catalogo { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .item-regalo { background: var(--blanco); padding: 15px; border-radius: 15px; text-align: center; }
+        .item-regalo img { width: 100%; border-radius: 10px; height: 150px; object-fit: cover; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" class="logo-small">
+    </header>
+
+    <h1>¡Bienvenida a tu Panel!</h1>
+    <p>¿Cómo quieres empezar a armar tu mesa?</p>
+
+    <div class="opciones-principales">
+        <div class="card-btn" onclick="mostrarFormulario()">
+            <h3>✨ Crear desde cero</h3>
+            <p>Sube tus propias fotos de experiencias o productos específicos.</p>
+        </div>
+        <div class="card-btn" onclick="mostrarRecomendaciones()">
+            <h3>🎁 Recomendaciones</h3>
+            <p>Elige de nuestra lista curada de platos, copas y básicos.</p>
+        </div>
+    </div>
+
+    <div id="form-personalizado">
+        <h3>Agregar Regalo Personalizado</h3>
+        <div class="input-group">
+            <label>Nombre del Regalo (ej. Salto en Paracaídas)</label>
+            <input type="text" id="nombre-regalo" placeholder="¿Qué es?">
+        </div>
+        <div class="input-group">
+            <label>Link de la Imagen (URL)</label>
+            <input type="text" id="foto-regalo" placeholder="Pega el link de la foto">
+        </div>
+        <div class="input-group" style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Precio Unitario ($)</label>
+                <input type="number" id="precio-regalo" placeholder="Ej: 1500">
+            </div>
+            <div style="flex: 1;">
+                <label>Cantidad (Stock)</label>
+                <input type="number" id="cantidad-regalo" placeholder="Ej: 1">
+            </div>
+        </div>
+        <button class="btn-guardar" onclick="guardarRegalo()">Añadir a mi mesa</button>
+    </div>
+
+    <div id="seccion-recomendaciones">
+        <h3>Regalos Sugeridos por Odara</h3>
+        <div class="grid-catalogo">
+            <div class="item-regalo">
+                <img src="https://images.unsplash.com/photo-1577202214328-c04b77cefb5d?q=80&w=400" alt="Vajilla">
+                <h4>Set de Vajilla Blanca</h4>
+                <p>Sugerido: $1,200</p>
+                <button onclick="configurarSugerido('Set de Vajilla', 1200, 'url_foto')" class="btn-guardar" style="padding: 8px; font-size: 0.8rem;">Personalizar y Añadir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function mostrarFormulario() {
+        document.getElementById('form-personalizado').style.display = 'block';
+        document.getElementById('seccion-recomendaciones').style.display = 'none';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function mostrarRecomendaciones() {
+        document.getElementById('seccion-recomendaciones').style.display = 'block';
+        document.getElementById('form-personalizado').style.display = 'none';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function guardarRegalo() {
+        const nombre = document.getElementById('nombre-regalo').value;
+        const cantidad = document.getElementById('cantidad-regalo').value;
+        const precio = document.getElementById('precio-regalo').value;
+
+        if(!nombre || !cantidad || !precio) return alert("Por favor completa todos los campos.");
+
+        alert("¡Listo! Has añadido " + cantidad + " unidades de '" + nombre + "' a tu mesa.");
+        // Aquí conectaremos Firestore en el siguiente paso para guardar esto bajo el ID 2001
+    }
+</script>
+
+</body>
+</html>
