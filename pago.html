@@ -8,47 +8,95 @@
     <style>
         :root { --primario: #d4a373; --fondo: #fefae0; --texto: #4a4a4a; --blanco: #ffffff; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .pago-card { background: var(--blanco); padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        .monto-destacado { font-size: 2rem; color: var(--primario); font-weight: 600; margin: 20px 0; }
-        .instrucciones { background: #f9f9f9; padding: 20px; border-radius: 15px; text-align: left; margin: 20px 0; border: 1px dashed var(--primario); }
-        .btn-finalizar { background: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; text-decoration: none; display: block; }
-        .btn-finalizar:hover { background: #b08968; }
+        .pago-card { background: var(--blanco); padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; }
+        .monto-destacado { font-size: 1.8rem; color: var(--primario); font-weight: 600; margin: 15px 0; }
+        .instrucciones { background: #f9f9f9; padding: 15px; border-radius: 15px; text-align: left; margin: 15px 0; border: 1px dashed var(--primario); font-size: 0.9rem; }
+        
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        label { display: block; text-align: left; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px; }
+
+        .btn-finalizar { background: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-finalizar:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
 <div class="pago-card">
-    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" style="width: 70px; margin-bottom: 20px;">
-    <h2>¡Gracias por tu detalle!</h2>
-    <p>Estás regalando: <br><strong id="nombre-regalo">...</strong></p>
-    
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" style="width: 60px; margin-bottom: 10px;">
+    <h3>¡Gracias por tu detalle!</h3>
+    <p style="margin:0; font-size: 0.9rem;">Regalo: <strong id="nombre-regalo">...</strong></p>
     <div class="monto-destacado" id="monto-regalo">$0.00</div>
 
-    <div class="instrucciones">
-        <p style="margin-top:0; font-weight: 600;">Datos de Transferencia:</p>
-        <p><strong>Banco:</strong> Mi Banco Ideal</p>
-        <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
-        <p><strong>A nombre de:</strong> Nombre de la Anfitriona</p>
-        <p style="font-size: 0.8rem; color: #888; margin-bottom: 0;">* Una vez realizada la transferencia, el anfitrión recibirá una notificación.</p>
+    <div style="margin-bottom: 20px;">
+        <label>Tu Nombre</label>
+        <input type="text" id="invitado-nombre" placeholder="¿Quién envía el regalo?">
+        
+        <label>Mensaje para el anfitrión</label>
+        <textarea id="invitado-mensaje" rows="3" placeholder="¡Felicidades! Te queremos mucho..."></textarea>
     </div>
 
-    <button class="btn-finalizar" onclick="notificarPago()">Ya realicé el pago</button>
-    <a href="javascript:history.back()" style="display:block; margin-top:15px; font-size: 0.8rem; color: #999; text-decoration: none;">Volver atrás</a>
+    <div class="instrucciones">
+        <p style="margin-top:0; font-weight: 600;">Datos para tu transferencia:</p>
+        <p style="margin: 5px 0;"><strong>Banco:</strong> BBVA</p>
+        <p style="margin: 5px 0;"><strong>CLABE:</strong> 0123 4567 8901 2345 67</p>
+        <p style="margin: 5px 0;"><strong>A nombre de:</strong> Mesa Odara</p>
+    </div>
+
+    <button class="btn-finalizar" id="btn-confirmar" onclick="confirmarYGuardar()">He realizado mi transferencia</button>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+        authDomain: "odara-15d63.firebaseapp.com",
+        projectId: "odara-15d63",
+        storageBucket: "odara-15d63.firebasestorage.app",
+        messagingSenderId: "574365543873",
+        appId: "1:574365543873:web:d55ad62b17231e39e89340"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const params = new URLSearchParams(window.location.search);
     const regalo = params.get('regalo');
     const monto = params.get('monto');
+    const idEvento = params.get('id');
 
     document.getElementById('nombre-regalo').innerText = regalo;
     document.getElementById('monto-regalo').innerText = `$${monto}`;
 
-    function notificarPago() {
-        alert("¡Gracias! Hemos registrado tu intención de regalo. El anfitrión validará la transferencia pronto.");
-        window.location.href = "index.html"; // O mandarlos de vuelta a la mesa
-    }
-</script>
+    window.confirmarYGuardar = async () => {
+        const nombre = document.getElementById('invitado-nombre').value;
+        const mensaje = document.getElementById('invitado-mensaje').value;
+        const btn = document.getElementById('btn-confirmar');
 
+        if(!nombre) return alert("Por favor, pon tu nombre para que sepan quién les dio el regalo.");
+
+        btn.disabled = true;
+        btn.innerText = "Guardando...";
+
+        try {
+            // Guardamos la contribución en una subcolección del evento
+            await addDoc(collection(db, "eventos", "evento_" + idEvento, "contribuciones"), {
+                invitado: nombre,
+                mensaje: mensaje,
+                regalo: regalo,
+                monto: monto,
+                fecha: new Date(),
+                visto: false
+            });
+
+            alert("¡Mensaje enviado! El anfitrión recibirá tu notificación.");
+            window.location.href = "index.html";
+        } catch (e) {
+            alert("Error al conectar. Intenta de nuevo.");
+            btn.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>
