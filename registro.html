@@ -18,6 +18,67 @@
         .btn-crear { width: 100%; background-color: var(--primario); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .info-paso { font-size: 0.8rem; color: #888; text-align: center; margin-top: 15px; }
     </style>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // --- REEMPLAZA ESTO CON TUS LLAVES DE FIREBASE ---
+  cconst firebaseConfig = {
+    apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+    authDomain: "odara-15d63.firebaseapp.com",
+    projectId: "odara-15d63",
+    storageBucket: "odara-15d63.firebasestorage.app",
+    messagingSenderId: "574365543873",
+    appId: "1:574365543873:web:d55ad62b17231e39e89340",
+    measurementId: "G-0LYV3GE6KK"
+  };
+  // -------------------------------------------------
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Función para crear el evento y generar el número 2001+
+  window.crearEvento = async function() {
+    const nombres = document.getElementById('nombres').value;
+    const bienvenida = document.getElementById('bienvenida').value;
+    const foto = document.getElementById('foto').value;
+
+    if(!nombres) return alert("Por favor escribe los nombres.");
+
+    try {
+      const contadorRef = doc(db, "configuracion", "contador");
+      
+      // Esta parte hace la suma automática del número de evento
+      await runTransaction(db, async (transaction) => {
+        const contadorDoc = await transaction.get(contadorRef);
+        if (!contadorDoc.exists()) {
+          throw "¡El contador no existe! Revisa el paso de Firestore.";
+        }
+
+        const nuevoNumero = contadorDoc.data().ultimoEvento + 1;
+        const nuevoEventoID = "evento_" + nuevoNumero;
+
+        // Guardar los datos del nuevo anfitrión
+        transaction.set(doc(db, "eventos", nuevoEventoID), {
+          nombres: nombres,
+          bienvenida: bienvenida,
+          foto: foto,
+          numeroEvento: nuevoNumero,
+          fechaCreacion: new Date()
+        });
+
+        // Actualizar el contador para el siguiente (2002, 2003...)
+        transaction.update(contadorRef, { ultimoEvento: nuevoNumero });
+
+        alert("¡Éxito! Tu número de evento Odara es: " + nuevoNumero);
+        // Aquí podrías mandarlos a su panel de control después
+      });
+    } catch (e) {
+      console.error("Error: ", e);
+      alert("Hubo un error al crear el evento.");
+    }
+  }
+</script>
 </head>
 <body>
 
