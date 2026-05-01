@@ -3,100 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odara - Mesas de Regalos Inteligentes</title>
+    <title>Odara - Mesas de Regalos Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primario: #d4a373; --fondo: #FAF7F2; --texto: #4a4a4a; --blanco: #ffffff; }
-        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--fondo); color: var(--texto); }
+        :root {
+            --fondo-marfil: #FAF7F2;      /* Fondo principal */
+            --azul-profundo: #102A43;     /* Color de marca principal */
+            --beige-arena: #E9D8C4;       /* Color cálido secundario */
+            --terracota: #C97B63;         /* Color emocional / acento */
+            --gris-azul: #5C6770;         /* Color funcional / texto secundario */
+            --dorado: #C8A96B;            /* Color premium final */
+            --blanco: #ffffff;
+        }
 
-        /* HEADER & NAV */
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            background-color: var(--fondo-marfil); 
+            color: var(--azul-profundo);
+            scroll-behavior: smooth;
+        }
+
+        /* --- HEADER --- */
         header { 
             background: var(--blanco); 
             padding: 15px 5%; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--beige-arena);
         }
-        
-        .header-top { 
-            display: flex; 
-            justify-content: space-between; /* Mantiene logo a la izquierda y hamburguesa a la derecha */
-            align-items: center; 
-            width: 100%;
-        }
-        
-        .logo { max-width: 100px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .logo { max-width: 90px; }
+        .menu-toggle { font-size: 1.8rem; cursor: pointer; background: none; border: none; color: var(--azul-profundo); }
 
-        /* MENÚ DESKTOP */
-        nav { 
-            display: flex; 
-            justify-content: center; 
-            margin-top: 15px; 
-            gap: 30px; 
-        }
-        nav a { text-decoration: none; color: var(--texto); font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-        nav a:hover { color: var(--primario); }
+        nav { display: flex; justify-content: center; margin-top: 15px; gap: 30px; }
+        nav a { text-decoration: none; color: var(--azul-profundo); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        nav a:hover { color: var(--terracota); }
 
-        /* MENÚ MÓVIL (HAMBURGUESA) */
-        .menu-toggle { 
-            display: none; 
-            font-size: 1.8rem; 
-            cursor: pointer; 
-            background: none; 
-            border: none; 
-            color: var(--primario);
-            padding: 0;
+        /* --- SECCIÓN 1: HERO (Fondo Marfil) --- */
+        .hero { 
+            text-align: center; 
+            padding: 100px 20px; 
+            max-width: 900px; 
+            margin: 0 auto; 
         }
+        .hero h1 { font-size: 3rem; font-weight: 600; margin-bottom: 20px; line-height: 1.2; }
+        .hero p { font-size: 1.2rem; color: var(--gris-azul); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        
+        .btn-azul { 
+            display: inline-block; background: var(--azul-profundo); color: var(--blanco); 
+            padding: 18px 45px; border-radius: 8px; text-decoration: none; 
+            font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(16, 42, 67, 0.2);
+        }
+        .btn-azul:hover { background: var(--terracota); transform: translateY(-2px); }
+
+        /* --- SECCIÓN 2: COLECCIONES (Fondo Beige + Tarjetas Marfil) --- */
+        .colecciones { background-color: var(--beige-arena); padding: 80px 5%; text-align: center; }
+        .grid-colecciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px; }
+        .card-marfil { 
+            background: var(--fondo-marfil); padding: 30px; border-radius: 15px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(200, 169, 107, 0.2);
+        }
+
+        /* --- SECCIÓN 3: STORYTELLING (Fondo Azul + Detalles Dorados) --- */
+        .storytelling { 
+            background-color: var(--azul-profundo); 
+            color: var(--fondo-marfil); 
+            padding: 100px 10%; 
+            text-align: center; 
+        }
+        .storytelling h2 { color: var(--dorado); font-size: 2.2rem; margin-bottom: 30px; }
+        .storytelling p { font-size: 1.1rem; line-height: 1.8; max-width: 700px; margin: 0 auto; opacity: 0.9; }
+        .divisor-dorado { width: 60px; height: 3px; background: var(--dorado); margin: 30px auto; }
+
+        /* --- SECCIÓN 4: EXPERIENCIA (Fondo Marfil + Acentos Terracota) --- */
+        .experiencia { padding: 80px 5%; text-align: center; }
+        .acento-terracota { color: var(--terracota); font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; }
+
+        /* BUSCADOR (DENTRO DE EXPERIENCIA) */
+        .search-container { margin-top: 40px; }
+        .search-box { 
+            background: var(--blanco); padding: 10px; border-radius: 50px; 
+            display: inline-flex; border: 1px solid var(--beige-arena);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .search-box input { border: none; padding: 10px 25px; border-radius: 50px; outline: none; width: 200px; }
+        .btn-terracota { 
+            background: var(--terracota); color: white; border: none; 
+            padding: 10px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; 
+        }
+
+        /* --- SECCIÓN 5: TESTIMONIOS (Fondo Beige) --- */
+        .testimonios { background-color: var(--beige-arena); padding: 80px 5%; text-align: center; }
+
+        /* --- FOOTER (Azul Profundo + Detalles Dorados) --- */
+        footer { 
+            background-color: var(--azul-profundo); 
+            color: var(--fondo-marfil); 
+            padding: 60px 5% 30px; 
+            text-align: center; 
+            border-top: 4px solid var(--dorado);
+        }
+        .footer-links a { color: var(--dorado); text-decoration: none; margin: 0 15px; font-size: 0.9rem; }
         
         @media (max-width: 768px) {
-            header { 
-                flex-direction: row; /* En móvil el header es una fila */
-                flex-wrap: wrap; 
-            }
-            .menu-toggle { display: block; order: 2; } /* Aparece y se queda a la derecha */
-            .logo { order: 1; } /* Logo a la izquierda */
-
-            nav { 
-                display: none; 
-                flex-direction: column; 
-                width: 100%; 
-                text-align: center; 
-                padding: 20px 0; 
-                order: 3; /* El menú desplegado queda abajo de todo */
-            }
-            nav.active { display: flex; }
-            nav a { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-        }
-
-        /* HERO SECTION */
-        .hero { text-align: center; padding: 60px 20px; max-width: 800px; margin: 0 auto; }
-        .hero h1 { font-size: 2.5rem; color: var(--primario); margin-bottom: 20px; }
-        .hero p { font-size: 1.1rem; line-height: 1.6; color: #666; margin-bottom: 40px; }
-
-        /* BUSCADOR */
-        .search-box { 
-            background: var(--blanco); 
-            padding: 30px; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            display: inline-block;
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-        }
-        .search-box h3 { margin-top: 0; font-size: 1rem; }
-        .search-box input { 
-            width: 60%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; 
-        }
-        .btn-buscar { 
-            padding: 12px 20px; background: var(--primario); color: white; border: none; border-radius: 10px; 
-            cursor: pointer; font-weight: bold; 
-        }
-
-        .btn-cta { 
-            display: inline-block; background: var(--primario); color: white; padding: 15px 40px; 
-            border-radius: 15px; text-decoration: none; font-weight: bold; margin-top: 20px;
-            transition: 0.3s;
+            .hero h1 { font-size: 2.2rem; }
+            nav { display: none; }
         }
     </style>
 </head>
@@ -105,42 +117,79 @@
 <header>
     <div class="header-top">
         <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" class="logo">
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <button class="menu-toggle">☰</button>
     </div>
-    <nav id="main-nav">
+    <nav>
         <a href="login.html">Iniciar Sesión</a>
-        <a href="registro.html">Abrir Mesa de Regalos</a>
+        <a href="registro.html">Abrir Mesa</a>
         <a href="#buscar">Soy Invitado</a>
     </nav>
 </header>
 
 <section class="hero">
-    <h1>Regalos que cuentan historias.</h1>
-    <p>Crea tu mesa de regalos personalizada en minutos. Recibe lo que realmente necesitas y mantén el contacto con tus invitados de forma sencilla y elegante.</p>
-    
-    <div class="search-box" id="buscar">
-        <h3>¿Eres invitado?</h3>
-        <p style="font-size: 0.8rem; color: #999;">Ingresa el código del evento que te compartieron</p>
-        <input type="number" id="codigo-evento" placeholder="Ej: 102">
-        <button class="btn-buscar" onclick="buscarEvento()">Ir</button>
-    </div>
-
-    <br><br>
-    <a href="registro.html" class="btn-cta">Comenzar mi mesa gratis</a>
+    <h1>Celebra con propósito, regala con el corazón.</h1>
+    <p>La plataforma premium para gestionar tus listas de regalos de forma elegante, sencilla y totalmente personalizada.</p>
+    <a href="registro.html" class="btn-azul">Comenzar mi mesa</a>
 </section>
 
-<script>
-    function toggleMenu() {
-        const nav = document.getElementById('main-nav');
-        nav.classList.toggle('active');
-    }
+<section class="colecciones">
+    <span class="acento-terracota" style="color: var(--azul-profundo)">Nuestras Categorías</span>
+    <div class="grid-colecciones">
+        <div class="card-marfil">
+            <h3 style="color: var(--terracota)">Baby Shower</h3>
+            <p style="font-size: 0.85rem; color: var(--gris-azul)">Todo lo necesario para la llegada más esperada.</p>
+        </div>
+        <div class="card-marfil">
+            <h3 style="color: var(--terracota)">Bodas</h3>
+            <p style="font-size: 0.85rem; color: var(--gris-azul)">Detalles inolvidables para el inicio de su nueva vida.</p>
+        </div>
+        <div class="card-marfil">
+            <h3 style="color: var(--terracota)">Cumpleaños</h3>
+            <p style="font-size: 0.85rem; color: var(--gris-azul)">Haz que sus deseos se vuelvan realidad.</p>
+        </div>
+    </div>
+</section>
 
+<section class="storytelling">
+    <h2>El arte de recibir</h2>
+    <div class="divisor-dorado"></div>
+    <p>En Odara creemos que cada regalo es una historia compartida. Nuestra misión es eliminar el caos de la logística para que tú solo te enfoques en lo que importa: disfrutar de tus seres queridos y crear memorias que durarán toda la vida.</p>
+</section>
+
+<section class="experiencia" id="buscar">
+    <span class="acento-terracota">Búsqueda Directa</span>
+    <h2>Encuentra una mesa de regalos</h2>
+    <div class="search-container">
+        <div class="search-box">
+            <input type="number" id="codigo-evento" placeholder="Código del evento">
+            <button class="btn-terracota" onclick="buscarEvento()">Buscar</button>
+        </div>
+    </div>
+</section>
+
+<section class="testimonios">
+    <p style="font-style: italic; font-size: 1.2rem;">"La elegancia de la página dejó a mis invitados sorprendidos. Fue tan fácil para ellos regalar que completamos la lista en una semana."</p>
+    <span style="color: var(--dorado); font-weight: 600;">— Mariana G., Ciudad de México</span>
+</section>
+
+<footer>
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" style="width: 60px; filter: brightness(0) invert(1); margin-bottom: 20px;">
+    <div class="footer-links">
+        <a href="#">Privacidad</a>
+        <a href="#">Términos</a>
+        <a href="#">Afiliados</a>
+        <a href="#">Contacto</a>
+    </div>
+    <p style="font-size: 0.7rem; margin-top: 30px; color: var(--dorado); opacity: 0.8;">© 2026 Odara. Todos los derechos reservados.</p>
+</footer>
+
+<script>
     function buscarEvento() {
         const id = document.getElementById('codigo-evento').value;
         if(id) {
             window.location.href = `evento.html?id=${id}`;
         } else {
-            alert("Por favor, ingresa un número de evento válido.");
+            alert("Por favor, ingresa un número de evento.");
         }
     }
 </script>
