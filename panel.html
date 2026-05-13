@@ -3,200 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Panel - Odara</title>
+    <title>Panel de Control - Odara</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --fondo-marfil: #FAF7F2;
             --azul-profundo: #102A43;
-            --beige-arena: #E9D8C4;
-            --terracota: #C97B63;
-            --gris-azul: #5C6770;
             --dorado: #C8A96B;
+            --terracota: #C97B63;
             --blanco: #ffffff;
+            --gris-azul: #5C6770;
         }
 
         body { 
             font-family: 'Montserrat', sans-serif; 
-            background-color: var(--fondo-marfil); 
-            color: var(--azul-profundo); 
             margin: 0; 
-        }
-
-        /* SIDEBAR / NAV */
-        nav {
-            background-color: var(--blanco);
-            padding: 20px 5%;
+            background-color: var(--fondo-marfil); 
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--beige-arena);
-        }
-        .logo-panel { max-width: 60px; }
-
-        /* LAYOUT */
-        .container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
-        
-        .welcome-header { margin-bottom: 40px; }
-        .welcome-header h1 { font-weight: 300; font-size: 2rem; }
-        .welcome-header span { font-weight: 600; color: var(--terracota); }
-
-        /* SECCIÓN CATÁLOGO */
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .line { flex: 1; height: 1px; background: var(--beige-arena); }
-
-        .grid-catalogo {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
         }
 
-        .card-producto {
-            background: var(--blanco);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid var(--beige-arena);
-            text-align: center;
-            transition: 0.3s;
-        }
-        .card-producto:hover {
-            border-color: var(--dorado);
-            transform: translateY(-5px);
-        }
-
-        .card-producto h3 { font-size: 1.1rem; margin-bottom: 15px; }
-
-        /* EDITOR DE PRECIO */
-        .price-editor {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background: var(--fondo-marfil);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .price-editor span { font-weight: 600; color: var(--gris-azul); }
-        .input-precio {
-            width: 80px;
-            border: none;
-            background: transparent;
-            font-family: 'Montserrat';
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--azul-profundo);
-            text-align: center;
-            border-bottom: 2px solid var(--dorado);
-        }
-        .input-precio:focus { outline: none; border-bottom-color: var(--terracota); }
-
-        .btn-add {
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 250px;
             background-color: var(--azul-profundo);
-            color: var(--blanco);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
+            height: 100vh;
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
         }
-        .btn-add:hover { background-color: var(--terracota); }
+        .sidebar h2 { color: var(--dorado); font-size: 1.2rem; letter-spacing: 2px; }
+        .nav-links { margin-top: 50px; }
+        .nav-links a { 
+            display: block; color: white; text-decoration: none; 
+            padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+        .btn-logout { 
+            margin-top: 100px; background: none; border: 1px solid var(--terracota); 
+            color: var(--terracota); padding: 10px 20px; cursor: pointer; width: 100%;
+        }
 
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content { margin-left: 280px; padding: 40px; width: 100%; }
+        
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        
+        .card-stats {
+            background: var(--blanco); padding: 25px; border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-left: 5px solid var(--dorado);
+            margin-bottom: 30px;
+        }
+
+        /* --- FORMULARIO --- */
+        .form-regalo {
+            background: var(--blanco); padding: 30px; border-radius: 15px;
+            max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .form-regalo input {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
+        }
+        .btn-add {
+            background: var(--azul-profundo); color: white; border: none;
+            padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: bold;
+        }
+
+        /* --- LISTA DE REGALOS --- */
+        .lista-regalos { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .item-regalo { background: white; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #eee; }
+        .item-regalo img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara" class="logo-panel">
-    <div class="user-menu">
-        <strong>Mi Mesa</strong> | <a href="login.html" style="color: var(--gris-azul); text-decoration: none; font-size: 0.8rem;">Cerrar Sesión</a>
-    </div>
-</nav>
-
-<div class="container">
-    <header class="welcome-header">
-        <h1>Bienvenida a tu panel, <span>Anfitriona</span></h1>
-        <p>Selecciona los regalos que quieres incluir en tu lista y ajusta su valor.</p>
-    </header>
-
-    <div class="section-title">
-        <h2 style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;">Sugerencias del Catálogo</h2>
-        <div class="line"></div>
-    </div>
-
-    <!-- AQUÍ SE MOSTRARÁN LOS PRODUCTOS DE TU FIREBASE -->
-    <div id="contenedor-productos" class="grid-catalogo">
-        <!-- Ejemplo de cómo se verá una tarjeta generada automáticamente -->
-        <div class="card-producto">
-            <h3>Pañalera</h3>
-            <p style="font-size: 0.7rem; color: var(--gris-azul); margin-bottom: 10px;">PRECIO SUGERIDO</p>
-            <div class="price-editor">
-                <span>$</span>
-                <input type="number" class="input-precio" value="1500">
-            </div>
-            <button class="btn-add">AÑADIR A MI MESA</button>
+    <div class="sidebar">
+        <h2>ODARA</h2>
+        <div class="nav-links">
+            <a href="#">Mis Regalos</a>
+            <a href="#" id="link-mi-mesa" target="_blank">Ver mi Mesa pública</a>
+            <a href="#">Configuración</a>
         </div>
+        <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
     </div>
-</div>
 
-<script>
+    <div class="main-content">
+        <div class="header-panel">
+            <h1 id="bienvenida">Bienvenida...</h1>
+            <span id="id-evento-display" style="background: var(--dorado); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem;">ID: ---</span>
+        </div>
+
+        <div class="card-stats">
+            <h3 style="margin: 0; color: var(--gris-azul);">Total Recaudado</h3>
+            <p style="font-size: 2rem; font-weight: 600; color: var(--azul-profundo); margin: 10px 0;">$0.00 MXN</p>
+        </div>
+
+        <div class="form-regalo">
+            <h3>Agregar nuevo regalo</h3>
+            <input type="text" id="nombre-regalo" placeholder="Nombre del regalo (ej: Vajilla)">
+            <input type="number" id="precio-regalo" placeholder="Precio (ej: 1500)">
+            <input type="text" id="imagen-regalo" placeholder="Link de la imagen del producto">
+            <button class="btn-add" onclick="subirRegalo()">Añadir a la lista</button>
+        </div>
+
+        <div class="lista-regalos" id="contenedor-regalos">
+            </div>
+    </div>
+
     <script>
-    const db = firebase.firestore();
-    const contenedor = document.getElementById('contenedor-productos');
+        // CONFIGURACIÓN DE FIREBASE (Tus credenciales guardadas)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+            authDomain: "odara-15d63.firebaseapp.com",
+            projectId: "odara-15d63",
+            storageBucket: "odara-15d63.firebasestorage.app",
+            messagingSenderId: "574365543873",
+            appId: "1:574365543873:web:d55ad62b17231e39e89340",
+            measurementId: "G-0LYV3GE6KK"
+        };
 
-    // AQUÍ ESTÁ EL PASO 1 (Cargar los datos)
-    function cargarCatalogo() {
-        db.collection("catalogo_maestro").doc("baby_shower").get().then((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                const productos = data.productos;
-                contenedor.innerHTML = '';
-                productos.forEach((prod, index) => {
-                    // Esta línea llama al Paso 2
-                    crearTarjeta(prod, index);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let mesaActualId = "";
+
+        // 1. PROTEGER RUTA Y CARGAR DATOS
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // El usuario está logueado, buscamos su mesa
+                db.collection("mesas_publicas").where("dueno_id", "==", user.uid).get()
+                .then(querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        mesaActualId = doc.id;
+                        document.getElementById('bienvenida').innerText = "Hola, " + data.nombres;
+                        document.getElementById('id-evento-display').innerText = "Mesa ID: " + mesaActualId;
+                        document.getElementById('link-mi-mesa').href = "mesa.html?id=" + mesaActualId;
+                        cargarRegalosPanel();
+                    });
                 });
+            } else {
+                window.location.href = "login.html";
             }
         });
-    }
 
-    // --- AQUÍ PONES EL PASO 2 ---
-    function crearTarjeta(prod, index) {
-        const html = `
-            <div class="card-producto">
-                <h3>${prod.nombre}</h3>
-                <p style="font-size: 0.7rem; color: var(--gris-azul); margin-bottom: 10px;">PRECIO SUGERIDO (LIVERPOOL)</p>
-                <div class="price-editor">
-                    <span>$</span>
-                    <input type="number" 
-                           id="precio-input-${index}" 
-                           class="input-precio" 
-                           value="${prod.precio}">
-                </div>
-                <button class="btn-add" onclick="guardarEnMiMesa('${prod.nombre}', ${index})">
-                    AÑADIR A MI MESA
-                </button>
-            </div>
-        `;
-        contenedor.innerHTML += html;
-    }
+        // 2. SUBIR REGALO A FIRESTORE
+        function subirRegalo() {
+            const nombre = document.getElementById('nombre-regalo').value;
+            const precio = document.getElementById('precio-regalo').value;
+            const imagen = document.getElementById('imagen-regalo').value;
 
-    // AQUÍ VA EL PASO 3 (La función del botón)
-    function guardarEnMiMesa(nombreProducto, index) {
-        const precioFinal = document.getElementById(`precio-input-${index}`).value;
-        alert(`Has añadido "${nombreProducto}" por un valor de $${precioFinal} a tu mesa pública.`);
-    }
+            if(nombre && precio && imagen) {
+                db.collection("mesas_publicas").doc(mesaActualId).collection("regalos").add({
+                    nombre: nombre,
+                    precio: Number(precio),
+                    imagen: imagen,
+                    fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    alert("Regalo añadido con éxito");
+                    location.reload(); // Recargamos para ver el nuevo item
+                });
+            } else {
+                alert("Por favor llena todos los campos");
+            }
+        }
 
-    // IMPORTANTE: Al final de todo, llama a la función para que empiece a trabajar
-    cargarCatalogo();
-</script>
+        // 3. CARGAR REGALOS EN EL PANEL
+        function cargarRegalosPanel() {
+            const contenedor = document.getElementById('contenedor-regalos');
+            db.collection("mesas_publicas").doc(mesaActualId).collection("regalos").get().then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    const r = doc.data();
+                    contenedor.innerHTML += `
+                        <div class="item-regalo">
+                            <img src="${r.imagen}">
+                            <p><strong>${r.nombre}</strong></p>
+                            <p style="color: var(--terracota)">$${r.precio}</p>
+                        </div>
+                    `;
+                });
+            });
+        }
 
+        // 4. CERRAR SESIÓN
+        function cerrarSesion() {
+            auth.signOut().then(() => {
+                window.location.href = "login.html";
+            });
+        }
+    </script>
 </body>
 </html>
