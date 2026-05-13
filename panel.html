@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Anfitrión - Odara</title>
+    <title>Mi Panel - Odara</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,95 +16,143 @@
             --blanco: #ffffff;
         }
 
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--fondo-marfil); color: var(--azul-profundo); margin: 0; padding: 0; }
-        
-        header { background: var(--azul-profundo); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
-        .logo-small { max-width: 70px; filter: brightness(0) invert(1); }
-        .btn-salir { color: var(--dorado); border: 1px solid var(--dorado); background: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 0.7rem; }
-
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        
-        /* BANNER LINK CON DORADO */
-        .share-banner { 
-            background: var(--azul-profundo); 
-            color: var(--blanco); 
-            padding: 35px; 
-            border-radius: 15px; 
-            text-align: center;
-            border-bottom: 5px solid var(--dorado);
-            margin-bottom: 40px;
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--fondo-marfil); 
+            color: var(--azul-profundo); 
+            margin: 0; 
         }
-        .numero-mesa-btn {
-            background: var(--dorado);
-            color: var(--azul-profundo);
-            display: inline-block;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 2rem;
-            font-weight: 600;
-            margin: 15px 0;
-            cursor: pointer;
+
+        /* SIDEBAR / NAV */
+        nav {
+            background-color: var(--blanco);
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--beige-arena);
+        }
+        .logo-panel { max-width: 60px; }
+
+        /* LAYOUT */
+        .container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
+        
+        .welcome-header { margin-bottom: 40px; }
+        .welcome-header h1 { font-weight: 300; font-size: 2rem; }
+        .welcome-header span { font-weight: 600; color: var(--terracota); }
+
+        /* SECCIÓN CATÁLOGO */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .line { flex: 1; height: 1px; background: var(--beige-arena); }
+
+        .grid-catalogo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .card-producto {
+            background: var(--blanco);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--beige-arena);
+            text-align: center;
             transition: 0.3s;
         }
-        .numero-mesa-btn:hover { background: var(--beige-arena); transform: scale(1.03); }
-
-        /* NOTIFICACIONES EN BEIGE */
-        #notificaciones-regalos { 
-            background: var(--beige-arena); 
-            padding: 25px; 
-            border-radius: 15px; 
-            margin-bottom: 30px; 
-        }
-        .notif-item { 
-            background: var(--fondo-marfil); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 12px; 
-            border: 1px solid rgba(16, 42, 67, 0.1); 
+        .card-producto:hover {
+            border-color: var(--dorado);
+            transform: translateY(-5px);
         }
 
-        /* TARJETAS DE GESTIÓN */
-        .card-blanca { background: var(--blanco); padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); margin-bottom: 25px; }
-        
-        .btn-accion { 
-            background: var(--azul-profundo); color: white; border: none; padding: 12px 25px; 
-            border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; 
-        }
-        .btn-accion:hover { background: var(--terracota); }
+        .card-producto h3 { font-size: 1.1rem; margin-bottom: 15px; }
 
-        h2, h3 { color: var(--azul-profundo); }
-        .text-secundario { color: var(--gris-azul); font-size: 0.9rem; }
+        /* EDITOR DE PRECIO */
+        .price-editor {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: var(--fondo-marfil);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .price-editor span { font-weight: 600; color: var(--gris-azul); }
+        .input-precio {
+            width: 80px;
+            border: none;
+            background: transparent;
+            font-family: 'Montserrat';
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--azul-profundo);
+            text-align: center;
+            border-bottom: 2px solid var(--dorado);
+        }
+        .input-precio:focus { outline: none; border-bottom-color: var(--terracota); }
+
+        .btn-add {
+            background-color: var(--azul-profundo);
+            color: var(--blanco);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .btn-add:hover { background-color: var(--terracota); }
+
     </style>
 </head>
 <body>
-    <header>
-        <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" class="logo-small">
-        <button class="btn-salir" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+
+<nav>
+    <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara" class="logo-panel">
+    <div class="user-menu">
+        <strong>Mi Mesa</strong> | <a href="login.html" style="color: var(--gris-azul); text-decoration: none; font-size: 0.8rem;">Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+    <header class="welcome-header">
+        <h1>Bienvenida a tu panel, <span>Anfitriona</span></h1>
+        <p>Selecciona los regalos que quieres incluir en tu lista y ajusta su valor.</p>
     </header>
 
-    <div class="container">
-        <div class="share-banner">
-            <span style="letter-spacing: 2px; font-size: 0.8rem; opacity: 0.8;">TU MESA DE REGALOS EXCLUSIVA</span><br>
-            <div class="numero-mesa-btn" id="numero-mesa-display" onclick="copiarLink()">...</div>
-            <p style="font-size: 0.8rem; color: var(--beige-arena);">Haz clic en el número para copiar tu link de invitados</p>
-        </div>
-
-        <div id="notificaciones-regalos">
-            <h3 style="margin-top:0;">🎁 Mensajes Recibidos</h3>
-            <div id="lista-notificaciones">
-                <!-- Se llena con Firebase -->
-            </div>
-        </div>
-
-        <div class="card-blanca">
-            <h3>✨ Personalización</h3>
-            <p class="text-secundario">Escribe el mensaje que verán tus invitados al entrar.</p>
-            <textarea id="mensaje-bienvenida" rows="2" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--beige-arena);"></textarea>
-            <button class="btn-accion" style="margin-top:10px;" onclick="guardarConfiguracion()">ACTUALIZAR MENSAJE</button>
-        </div>
-        
-        <!-- Aquí sigue el resto de secciones de inventario con el mismo estilo -->
+    <div class="section-title">
+        <h2 style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;">Sugerencias del Catálogo</h2>
+        <div class="line"></div>
     </div>
-    <!-- (El script de Firebase se mantiene igual al anterior) -->
+
+    <!-- AQUÍ SE MOSTRARÁN LOS PRODUCTOS DE TU FIREBASE -->
+    <div id="contenedor-productos" class="grid-catalogo">
+        <!-- Ejemplo de cómo se verá una tarjeta generada automáticamente -->
+        <div class="card-producto">
+            <h3>Pañalera</h3>
+            <p style="font-size: 0.7rem; color: var(--gris-azul); margin-bottom: 10px;">PRECIO SUGERIDO</p>
+            <div class="price-editor">
+                <span>$</span>
+                <input type="number" class="input-precio" value="1500">
+            </div>
+            <button class="btn-add">AÑADIR A MI MESA</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Aquí irá la lógica que hicimos anteriormente para:
+    // 1. Leer el catálogo de Firebase (colección catalogo_maestro)
+    // 2. Generar estas tarjetas dinámicamente
+    // 3. Guardar el precio que la usuaria edite
+</script>
+
 </body>
 </html>
