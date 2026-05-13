@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odara - Mesas de Regalos Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- SDK de Firebase (Versión de compatibilidad) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --fondo-marfil: #FAF7F2;      /* Fondo principal */
@@ -40,7 +45,7 @@
         nav a { text-decoration: none; color: var(--azul-profundo); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
         nav a:hover { color: var(--terracota); }
 
-        /* --- SECCIÓN 1: HERO (Fondo Marfil) --- */
+        /* --- SECCIÓN 1: HERO --- */
         .hero { 
             text-align: center; 
             padding: 100px 20px; 
@@ -57,7 +62,7 @@
         }
         .btn-azul:hover { background: var(--terracota); transform: translateY(-2px); }
 
-        /* --- SECCIÓN 2: COLECCIONES (Fondo Beige + Tarjetas Marfil) --- */
+        /* --- SECCIÓN 2: COLECCIONES --- */
         .colecciones { background-color: var(--beige-arena); padding: 80px 5%; text-align: center; }
         .grid-colecciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px; }
         .card-marfil { 
@@ -65,7 +70,7 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(200, 169, 107, 0.2);
         }
 
-        /* --- SECCIÓN 3: STORYTELLING (Fondo Azul + Detalles Dorados) --- */
+        /* --- SECCIÓN 3: STORYTELLING --- */
         .storytelling { 
             background-color: var(--azul-profundo); 
             color: var(--fondo-marfil); 
@@ -76,27 +81,28 @@
         .storytelling p { font-size: 1.1rem; line-height: 1.8; max-width: 700px; margin: 0 auto; opacity: 0.9; }
         .divisor-dorado { width: 60px; height: 3px; background: var(--dorado); margin: 30px auto; }
 
-        /* --- SECCIÓN 4: EXPERIENCIA (Fondo Marfil + Acentos Terracota) --- */
+        /* --- SECCIÓN 4: EXPERIENCIA --- */
         .experiencia { padding: 80px 5%; text-align: center; }
         .acento-terracota { color: var(--terracota); font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; }
 
-        /* BUSCADOR (DENTRO DE EXPERIENCIA) */
+        /* BUSCADOR */
         .search-container { margin-top: 40px; }
         .search-box { 
             background: var(--blanco); padding: 10px; border-radius: 50px; 
             display: inline-flex; border: 1px solid var(--beige-arena);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-        .search-box input { border: none; padding: 10px 25px; border-radius: 50px; outline: none; width: 200px; }
+        .search-box input { border: none; padding: 10px 25px; border-radius: 50px; outline: none; width: 250px; font-family: inherit; }
         .btn-terracota { 
             background: var(--terracota); color: white; border: none; 
-            padding: 10px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; 
+            padding: 10px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s;
         }
+        .btn-terracota:hover { background: var(--azul-profundo); }
 
-        /* --- SECCIÓN 5: TESTIMONIOS (Fondo Beige) --- */
+        /* --- SECCIÓN 5: TESTIMONIOS --- */
         .testimonios { background-color: var(--beige-arena); padding: 80px 5%; text-align: center; }
 
-        /* --- FOOTER (Azul Profundo + Detalles Dorados) --- */
+        /* --- FOOTER --- */
         footer { 
             background-color: var(--azul-profundo); 
             color: var(--fondo-marfil); 
@@ -109,6 +115,8 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.2rem; }
             nav { display: none; }
+            .search-box { display: flex; flex-direction: column; border-radius: 15px; width: 90%; margin: 0 auto; }
+            .search-box input { width: 100%; margin-bottom: 10px; text-align: center; }
         }
     </style>
 </head>
@@ -161,7 +169,8 @@
     <h2>Encuentra una mesa de regalos</h2>
     <div class="search-container">
         <div class="search-box">
-            <input type="number" id="codigo-evento" placeholder="Código del evento">
+            <!-- Cambiado a type="text" para permitir búsqueda por nombre o número -->
+            <input type="text" id="codigo-evento" placeholder="Introduce los 3 números o nombre...">
             <button class="btn-terracota" onclick="buscarEvento()">Buscar</button>
         </div>
     </div>
@@ -184,12 +193,70 @@
 </footer>
 
 <script>
-    function buscarEvento() {
-        const id = document.getElementById('codigo-evento').value;
-        if(id) {
-            window.location.href = `evento.html?id=${id}`;
-        } else {
-            alert("Por favor, ingresa un número de evento.");
+    // --- CONFIGURACIÓN DE FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROYECTO.firebaseapp.com",
+        projectId: "TU_PROYECTO_ID",
+        storageBucket: "TU_PROYECTO.appspot.com",
+        messagingSenderId: "TU_SENDER_ID",
+        appId: "TU_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Función para limpiar el nombre y convertirlo en ID amigable
+    function generarIDAmigable(texto) {
+        return texto.toString().toLowerCase().trim()
+            .replace(/\s+/g, '-')           // Reemplaza espacios por -
+            .replace(/[^\w\-]+/g, '')       // Elimina caracteres no alfanuméricos
+            .replace(/\-\-+/g, '-');        // Reemplaza múltiples - por uno solo
+    }
+
+    async function buscarEvento() {
+        const queryInput = document.getElementById('codigo-evento').value.trim();
+        
+        if (!queryInput) {
+            alert("Por favor, ingresa el código o nombre del evento.");
+            return;
+        }
+
+        // Caso A: El usuario ingresó un número (Búsqueda de 3 dígitos)
+        if (!isNaN(queryInput) && queryInput.length <= 3) {
+            db.collection("mesas_publicas")
+              .where("numero_evento", "==", Number(queryInput))
+              .where("activa", "==", true)
+              .get()
+              .then((querySnapshot) => {
+                  if (!querySnapshot.empty) {
+                      querySnapshot.forEach((doc) => {
+                          window.location.href = `mesa.html?id=${doc.id}`;
+                      });
+                  } else {
+                      alert("No encontramos eventos activos con el número: " + queryInput);
+                  }
+              })
+              .catch((error) => {
+                  console.error("Error al buscar número:", error);
+                  alert("Hubo un error en la búsqueda.");
+              });
+        } 
+        // Caso B: El usuario ingresó texto (Búsqueda por nombre/ID amigable)
+        else {
+            const idFormateado = generarIDAmigable(queryInput);
+            
+            db.collection("mesas_publicas").doc(idFormateado).get()
+              .then((doc) => {
+                  if (doc.exists && doc.data().activa) {
+                      window.location.href = `mesa.html?id=${doc.id}`;
+                  } else {
+                      alert("No encontramos ninguna mesa con ese nombre.");
+                  }
+              })
+              .catch((error) => {
+                  console.error("Error al buscar nombre:", error);
+              });
         }
     }
 </script>
