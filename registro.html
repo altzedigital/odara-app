@@ -147,7 +147,7 @@
 
         <form id="registro-form">
             <div class="form-group">
-                <label>Nombre del Evento (o nombre de los festejados)</label>
+                <label>Nombre del Evento (o festejados)</label>
                 <input type="text" id="nombre-evento" class="input-auth" placeholder="Ej. Boda de Ana y Juan" required>
             </div>
 
@@ -172,7 +172,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-registro">CREAR MI CUENTA</button>
+            <button type="submit" id="btn-submit" class="btn-registro">CREAR MI CUENTA</button>
         </form>
 
         <div class="auth-footer">
@@ -186,38 +186,50 @@
 </footer>
 
 <script>
-    // Configuración de tu Firebase (Pega aquí tus credenciales reales)
     const firebaseConfig = {
-  apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
-  authDomain: "odara-15d63.firebaseapp.com",
-  projectId: "odara-15d63",
-  storageBucket: "odara-15d63.firebasestorage.app",
-  messagingSenderId: "574365543873",
-  appId: "1:574365543873:web:d55ad62b17231e39e89340",
-  measurementId: "G-0LYV3GE6KK"
-};
+        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+        authDomain: "odara-15d63.firebaseapp.com",
+        projectId: "odara-15d63",
+        storageBucket: "odara-15d63.firebasestorage.app",
+        messagingSenderId: "574365543873",
+        appId: "1:574365543873:web:d55ad62b17231e39e89340",
+        measurementId: "G-0LYV3GE6KK"
+    };
 
-    // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Función para convertir "Boda de Ana" en "boda-de-ana" (ID Amigable)
-    function generarIDAmigable(texto) {
-        return texto
-            .toString()
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '-')      
-            .replace(/[^\w\-]+/g, '')   
-            .replace(/\-\-+/g, '-')
-            .replace(/^-+/, '')         
-            .replace(/-+$/, '');
+    // 1. FUNCIÓN PARA GENERAR ID DE 6 DÍGITOS ÚNICO
+    async function generarIDMesaUnico() {
+        let idGenerado;
+        let existe = true;
+
+        while (existe) {
+            idGenerado = Math.floor(100000 + Math.random() * 900000);
+            const snapshot = await db.collection("mesas_publicas")
+                                     .where("id_mesa", "==", idGenerado)
+                                     .get();
+            if (snapshot.empty) {
+                existe = false; 
+            }
+        }
+        return idGenerado;
     }
 
-    // Lógica del Formulario
+    // 2. FUNCIÓN PARA EL SLUG (URL AMIGABLE)
+    function generarIDAmigable(texto) {
+        return texto.toString().toLowerCase().trim()
+            .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+    }
+
+    // 3. LÓGICA DEL FORMULARIO
     document.getElementById('registro-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const btn = document.getElementById('btn-submit');
+        btn.innerText = "CREANDO...";
+        btn.disabled = true;
 
         const nombreEventoOriginal = document.getElementById('nombre-evento').value;
         const email = document.getElementById('email').value;
@@ -225,42 +237,42 @@
         const tipoEvento = document.getElementById('tipo-evento').value;
 
         try {
-            // 1. Crear usuario en Firebase Auth
+            // A. Crear usuario en Auth
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
-            // 2. Generar datos automáticos para la Mesa
-            const idMesaAmigable = generarIDAmigable(nombreEventoOriginal);
-            const numeroEvento = Math.floor(100 + Math.random() * 999); // 3 dígitos
+            // B. Generar ID de 6 dígitos único
+            const idMesaNumerico = await generarIDMesaUnico();
+            const slugAmigable = generarIDAmigable(nombreEventoOriginal);
 
-            // 3. Crear el Documento en 'mesas_publicas' de forma automática
-            // Usamos el idMesaAmigable como el Nombre del Documento
-            await db.collection("mesas_publicas").doc(idMesaAmigable).set({
-                numero_evento: numeroEvento,
-                nombre_evento: nombreEventoOriginal,
+            // C. Crear documento en 'mesas_publicas'
+            // Usamos el UID del usuario como nombre del documento para orden total
+            await db.collection("mesas_publicas").doc(user.uid).set({
+                id_mesa: idMesaNumerico, // El número de 6 dígitos
+                id_amigable: slugAmigable, // Para la URL opcional
+                nombres: nombreEventoOriginal,
                 tipo_evento: tipoEvento,
-                anfitrion_email: email,
-                anfitrion_uid: user.uid,
+                dueno_id: user.uid,
+                email: email,
                 activa: true,
-                mensaje_bienvenida: `¡Bienvenidos a nuestro ${tipoEvento}!`,
                 fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // 4. Guardar perfil básico del usuario
+            // D. Guardar en colección de usuarios (respaldo)
             await db.collection("usuarios").doc(user.uid).set({
                 email: email,
-                id_mesa: idMesaAmigable,
-                numero_evento: numeroEvento
+                id_mesa: idMesaNumerico,
+                rol: "anfitrion"
             });
 
-            alert(`¡Cuenta creada con éxito!\nTu número de evento es: ${numeroEvento}\nTu link es: odara.mx/${idMesaAmigable}`);
-            
-            // Redirigir al panel
+            alert(`¡Bienvenida a Odara!\nTu número de evento es: ${idMesaNumerico}`);
             window.location.href = "panel.html";
 
         } catch (error) {
-            console.error("Error en registro: ", error);
+            console.error(error);
             alert("Error: " + error.message);
+            btn.innerText = "CREAR MI CUENTA";
+            btn.disabled = false;
         }
     });
 </script>
