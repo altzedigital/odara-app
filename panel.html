@@ -148,32 +148,54 @@
 </div>
 
 <script>
-    // 1. Configura tu Firebase (asegúrate de tener cargada la librería de Firebase en el head)
-const db = firebase.firestore();
+    <script>
+    const db = firebase.firestore();
+    const contenedor = document.getElementById('contenedor-productos');
 
-// 2. Referencia al contenedor donde se mostrarán los productos
-const contenedor = document.getElementById('contenedor-productos');
+    // AQUÍ ESTÁ EL PASO 1 (Cargar los datos)
+    function cargarCatalogo() {
+        db.collection("catalogo_maestro").doc("baby_shower").get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                const productos = data.productos;
+                contenedor.innerHTML = '';
+                productos.forEach((prod, index) => {
+                    // Esta línea llama al Paso 2
+                    crearTarjeta(prod, index);
+                });
+            }
+        });
+    }
 
-// 3. Función para cargar el catálogo
-// NOTA: Aquí usamos "baby_shower" como ejemplo, luego lo haremos dinámico
-function cargarCatalogo() {
-    db.collection("catalogo_maestro").doc("baby_shower").get().then((doc) => {
-        if (doc.exists) {
-            const data = doc.data();
-            const productos = data.productos; // Este es tu array que creaste
-            
-            // Limpiamos el contenedor por si acaso
-            contenedor.innerHTML = '';
+    // --- AQUÍ PONES EL PASO 2 ---
+    function crearTarjeta(prod, index) {
+        const html = `
+            <div class="card-producto">
+                <h3>${prod.nombre}</h3>
+                <p style="font-size: 0.7rem; color: var(--gris-azul); margin-bottom: 10px;">PRECIO SUGERIDO (LIVERPOOL)</p>
+                <div class="price-editor">
+                    <span>$</span>
+                    <input type="number" 
+                           id="precio-input-${index}" 
+                           class="input-precio" 
+                           value="${prod.precio}">
+                </div>
+                <button class="btn-add" onclick="guardarEnMiMesa('${prod.nombre}', ${index})">
+                    AÑADIR A MI MESA
+                </button>
+            </div>
+        `;
+        contenedor.innerHTML += html;
+    }
 
-            // 4. Recorremos cada producto para crear su tarjeta
-            productos.forEach((prod, index) => {
-                crearTarjeta(prod, index);
-            });
-        } else {
-            console.log("No se encontró el catálogo");
-        }
-    });
-}
+    // AQUÍ VA EL PASO 3 (La función del botón)
+    function guardarEnMiMesa(nombreProducto, index) {
+        const precioFinal = document.getElementById(`precio-input-${index}`).value;
+        alert(`Has añadido "${nombreProducto}" por un valor de $${precioFinal} a tu mesa pública.`);
+    }
+
+    // IMPORTANTE: Al final de todo, llama a la función para que empiece a trabajar
+    cargarCatalogo();
 </script>
 
 </body>
