@@ -44,7 +44,7 @@
         </div>
 
         <div id="contenedor-regalos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            </div>
+        </div>
     </main>
 
     <footer class="py-10 text-center text-gray-400 text-sm tracking-widest uppercase font-light">
@@ -55,7 +55,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE TU FIREBASE (APIs AGREGADAS)
         const firebaseConfig = {
             apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
             authDomain: "odara-15d63.firebaseapp.com",
@@ -68,9 +67,31 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Obtener el ID de la mesa desde la URL (ej: ?id=2001)
         const urlParams = new URLSearchParams(window.location.search);
         const mesaId = urlParams.get('id');
+
+        // LÓGICA DE NEGOCIO: Comisión del 10% cobrada al invitado
+        window.comprarRegalo = function(nombre, precio) {
+            const comision = 0.10; // Tu ganancia
+            const precioOriginal = parseFloat(precio);
+            const cargoServicio = precioOriginal * comision;
+            const total = precioOriginal + cargoServicio;
+
+            const fmt = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
+
+            const mensaje = `Detalles de tu regalo:\n\n` +
+                            `Regalo: ${nombre}\n` +
+                            `Precio: ${fmt(precioOriginal)}\n` +
+                            `Cargo por servicio: ${fmt(cargoServicio)}\n` +
+                            `---------------------------\n` +
+                            `Total a pagar: ${fmt(total)}\n\n` +
+                            `¿Deseas proceder al pago seguro?`;
+
+            if (confirm(mensaje)) {
+                // Siguiente fase: Integración de checkout
+                alert("Redirigiendo a pasarela segura por " + fmt(total) + "...");
+            }
+        };
 
         async function cargarEvento() {
             if (!mesaId) {
@@ -87,7 +108,7 @@
                     const datosMesa = docMesa.data();
 
                     document.getElementById('nombres-novios').innerText = datosMesa.nombres || "Nuestra Boda";
-                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje || "Gracias por ser parte de este momento tan especial.";
+                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje || "Gracias por acompañarnos.";
 
                     cargarRegalos(docMesa.id);
                 } else {
@@ -106,7 +127,7 @@
             container.innerHTML = "";
 
             if (snapshot.empty) {
-                container.innerHTML = "<p class='text-center col-span-full text-gray-400'>Aún no se han añadido regalos a esta mesa.</p>";
+                container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Aún no se han añadido regalos a esta lista.</p>";
                 return;
             }
 
@@ -119,10 +140,10 @@
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all"></div>
                         </div>
                         <div class="p-8 text-center">
-                            <h4 class="font-serif text-2xl mb-3 text-odara-blue">${regalo.nombre}</h4>
-                            <p class="text-odara-gold font-bold text-xl mb-6 tracking-widest">$${Number(regalo.precio).toLocaleString()} MXN</p>
-                            <button onclick="alert('Funcionalidad de pago próximamente')" class="btn-gold w-full py-3 rounded-md uppercase text-sm font-semibold tracking-widest shadow-md">
-                                Regalar
+                            <h4 class="font-serif text-2xl mb-3 text-odara-blue uppercase tracking-tighter">${regalo.nombre}</h4>
+                            <p class="text-odara-gold font-bold text-xl mb-6 tracking-widest italic">$${Number(regalo.precio).toLocaleString()} MXN</p>
+                            <button onclick="comprarRegalo('${regalo.nombre}', ${regalo.precio})" class="btn-gold w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] shadow-md">
+                                Regalar ahora
                             </button>
                         </div>
                     </div>
