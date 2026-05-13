@@ -6,7 +6,7 @@
     <title>Panel de Administración - Odara</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <!-- SDK de Firebase -->
+    <!-- SDK de Firebase (Versión Compat para mantener tu estructura) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -127,7 +127,7 @@
 
         <div class="stats-grid">
             <div class="card-stats">
-                <h3>Total Recaudado</h3>
+                <h3>Total Recaudado (Para ti)</h3>
                 <p id="total-monto" style="color: var(--azul-profundo);">$0.00</p>
             </div>
             <div class="card-stats" style="border-left-color: var(--terracota);">
@@ -136,15 +136,15 @@
             </div>
         </div>
 
-        <!-- MURO DE ACTIVIDAD VISUAL -->
+        <!-- MURO DE ACTIVIDAD VISUAL - LEYENDO DE TRANSACCIONES -->
         <div class="panel-section">
-            <h3>Actividad Reciente (Quién regaló qué)</h3>
+            <h3>Actividad Reciente (Regalos Confirmados)</h3>
             <div id="muro-actividad">
                 <p style="color: var(--gris-azul); text-align: center;">Buscando regalos recibidos...</p>
             </div>
         </div>
 
-        <!-- GESTOR DE INVENTARIO CON STOCK -->
+        <!-- GESTOR DE INVENTARIO -->
         <div class="panel-section">
             <h3>Añadir Nuevo Regalo a la Lista</h3>
             <div class="grid-form">
@@ -158,9 +158,7 @@
 
         <div class="panel-section">
             <h3>Mi Lista de Deseos</h3>
-            <div class="inventario-grid" id="inventario-lista">
-                <!-- Se carga dinámicamente -->
-            </div>
+            <div class="inventario-grid" id="inventario-lista"></div>
         </div>
     </div>
 
@@ -179,7 +177,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let mesaIdGlobal = "";
+        let mesaIdPublico = null; 
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -193,97 +191,101 @@
             db.collection("mesas_publicas").where("dueno_id", "==", uid).get()
             .then(querySnapshot => {
                 querySnapshot.forEach(doc => {
-                    mesaIdGlobal = doc.id;
                     const data = doc.data();
+                    mesaIdPublico = data.id_mesa; // Usamos el ID numérico (ej. 2001)
                     
                     document.getElementById('txt-bienvenida').innerText = "Hola, " + data.nombres;
-                    document.getElementById('id-mesa-badge').innerText = "Mesa ID: " + mesaIdGlobal;
-                    document.getElementById('btn-ver-mesa').href = "mesa.html?id=" + mesaIdGlobal;
+                    document.getElementById('id-mesa-badge').innerText = "Mesa ID: " + mesaIdPublico;
+                    document.getElementById('btn-ver-mesa').href = "evento.html?id=" + mesaIdPublico;
 
-                    cargarRegalosRecibidos();
-                    cargarMiInventario();
+                    // Iniciamos las escuchas en tiempo real
+                    escucharTransacciones();
+                    cargarMiInventario(doc.id);
                 });
             });
         }
 
-        // CARGAR REGALOS RECIBIDOS (VERSIÓN VISUAL)
-        function cargarRegalosRecibidos() {
+        // CERRANDO EL CÍRCULO: Leer de la colección central de transacciones
+        function escucharTransacciones() {
             const muro = document.getElementById('muro-actividad');
             const txtMonto = document.getElementById('total-monto');
             const txtCant = document.getElementById('total-invitados');
-            
-            db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos_recibidos")
-            .orderBy("fecha", "desc").onSnapshot(snapshot => {
+
+            // Buscamos en la colección principal donde id_mesa coincida
+            db.collection("transacciones")
+            .where("id_mesa", "==", parseInt(mesaIdPublico))
+            .orderBy("fecha", "desc")
+            .onSnapshot(snapshot => {
                 if (snapshot.empty) {
-                    muro.innerHTML = "<p style='text-align:center; color:#ccc; padding:20px;'>Aún no tienes regalos. ¡Comparte tu link!</p>";
+                    muro.innerHTML = "<p style='text-align:center; color:#ccc; padding:20px;'>Aún no tienes regalos confirmados.</p>";
                     return;
                 }
 
                 muro.innerHTML = "";
-                let totalAcumulado = 0;
+                let totalParaAnfitrion = 0;
                 let totalPersonas = 0;
 
                 snapshot.forEach(doc => {
-                    const regalo = doc.data();
-                    totalAcumulado += regalo.monto;
+                    const t = doc.data();
+                    // Solo sumamos el monto base (sin tu comisión)
+                    totalParaAnfitrion += t.monto_anfitrion;
                     totalPersonas++;
 
                     muro.innerHTML += `
                         <div class="regalo-recibido-item">
-                            <img src="${regalo.producto_imagen || 'https://via.placeholder.com/50'}" class="img-regalo-mini">
                             <div style="flex-grow: 1;">
-                                <strong style="font-size:0.9rem;">${regalo.nombre_invitado}</strong>
-                                <span style="font-size:0.8rem; color:var(--terracota);"> regaló ${regalo.producto_nombre}</span>
-                                <p style="margin:4px 0 0; font-size:0.75rem; color:var(--gris-azul); font-style:italic;">"${regalo.mensaje}"</p>
+                                <strong style="font-size:0.9rem;">${t.invitado}</strong>
+                                <span style="font-size:0.8rem; color:var(--terracota);"> regaló ${t.regalo}</span>
+                                <p style="margin:4px 0 0; font-size:0.75rem; color:var(--gris-azul); font-style:italic;">Confirmado exitosamente</p>
                             </div>
                             <div style="text-align:right;">
-                                <span style="font-weight:600; color:var(--azul-profundo);">$${regalo.monto}</span>
+                                <span style="font-weight:600; color:var(--azul-profundo);">$${t.monto_anfitrion.toLocaleString()}</span>
                             </div>
                         </div>
                     `;
                 });
 
-                txtMonto.innerText = `$${totalAcumulado.toLocaleString()} MXN`;
+                txtMonto.innerText = `$${totalParaAnfitrion.toLocaleString()} MXN`;
                 txtCant.innerText = totalPersonas;
+            }, error => {
+                console.log("Error en snapshot: ", error);
             });
         }
 
-        // SUBIR PRODUCTO CON LÍMITE (STOCK)
         function subirNuevoProducto() {
             const nombre = document.getElementById('add-nombre').value;
             const precio = document.getElementById('add-precio').value;
             const imagen = document.getElementById('add-imagen').value;
             const cantidad = document.getElementById('add-cantidad').value;
 
-            if(!nombre || !precio) return alert("Por favor llena el nombre y precio.");
+            if(!nombre || !precio) return alert("Llena nombre y precio.");
 
-            db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos").add({
-                nombre: nombre,
-                precio: Number(precio),
-                imagen: imagen || "https://via.placeholder.com/150",
-                cantidad_total: Number(cantidad),
-                cantidad_comprada: 0,
-                creado: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                alert("¡Regalo añadido con éxito!");
-                document.getElementById('add-nombre').value = "";
-                document.getElementById('add-precio').value = "";
-                document.getElementById('add-imagen').value = "";
-                document.getElementById('add-cantidad').value = "1";
-                cargarMiInventario();
+            // Buscamos el documento de la mesa para añadir el regalo a su subcolección
+            db.collection("mesas_publicas").where("id_mesa", "==", parseInt(mesaIdPublico)).get()
+            .then(snap => {
+                const docRef = snap.docs[0].ref;
+                docRef.collection("regalos").add({
+                    nombre: nombre,
+                    precio: Number(precio),
+                    foto: imagen || "https://via.placeholder.com/150",
+                    cantidad_total: Number(cantidad),
+                    creado: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    alert("Regalo añadido.");
+                    location.reload();
+                });
             });
         }
 
-        function cargarMiInventario() {
+        function cargarMiInventario(docIdFirestore) {
             const lista = document.getElementById('inventario-lista');
-            db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos").orderBy("creado", "desc").get().then(snapshot => {
+            db.collection("mesas_publicas").doc(docIdFirestore).collection("regalos").get().then(snapshot => {
                 lista.innerHTML = "";
                 snapshot.forEach(doc => {
                     const item = doc.data();
                     lista.innerHTML += `
                         <div class="item-card">
-                            <div class="badge-stock">${item.cantidad_comprada} / ${item.cantidad_total} recibidos</div>
-                            <img src="${item.imagen}">
+                            <img src="${item.foto}">
                             <p style="font-size:0.85rem; font-weight:600; margin:5px 0;">${item.nombre}</p>
                             <strong style="color:var(--terracota);">$${item.precio} MXN</strong>
                         </div>
