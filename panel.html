@@ -19,6 +19,7 @@
             --terracota: #C97B63;
             --blanco: #ffffff;
             --gris-azul: #5C6770;
+            --beige-arena: #E3D5CA;
         }
 
         body { 
@@ -54,47 +55,50 @@
 
         /* --- CONTENIDO PRINCIPAL --- */
         .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
-        
         .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        /* --- CARDS DE ESTADÍSTICAS --- */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .card-stats {
             background: var(--blanco); padding: 25px; border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03); border-left: 5px solid var(--dorado);
         }
-        .card-stats h3 { margin: 0; color: var(--gris-azul); font-size: 0.9rem; text-transform: uppercase; }
-        .card-stats p { font-size: 2.2rem; font-weight: 600; margin: 10px 0; }
+        .card-stats h3 { margin: 0; color: var(--gris-azul); font-size: 0.8rem; text-transform: uppercase; }
+        .card-stats p { font-size: 2rem; font-weight: 600; margin: 10px 0; }
 
-        /* --- SECCIONES BLANCAS --- */
         .panel-section {
             background: var(--blanco); padding: 30px; border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03); margin-bottom: 30px;
         }
-        .panel-section h3 { margin-top: 0; border-bottom: 1px solid var(--fondo-marfil); padding-bottom: 15px; }
+        .panel-section h3 { margin-top: 0; border-bottom: 1px solid var(--fondo-marfil); padding-bottom: 15px; font-size: 1.1rem; }
 
         /* --- FORMULARIO --- */
-        .grid-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .grid-form { display: grid; grid-template-columns: 2fr 1fr 2fr 1fr; gap: 15px; margin-bottom: 15px; }
         .panel-section input {
             width: 100%; padding: 12px; border: 1px solid #eee; 
-            border-radius: 8px; box-sizing: border-box; outline: none;
+            border-radius: 8px; box-sizing: border-box; outline: none; font-family: 'Montserrat';
         }
         .btn-add {
             background: var(--azul-profundo); color: white; border: none;
-            padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
+            padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;
+            transition: 0.3s;
         }
+        .btn-add:hover { background: var(--terracota); }
 
-        /* --- LISTADO DE REGALOS RECIBIDOS --- */
+        /* --- MURO DE ACTIVIDAD VISUAL --- */
         .regalo-recibido-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 0; border-bottom: 1px solid #f9f9f9;
+            display: flex; align-items: center; gap: 15px;
+            padding: 15px; border-bottom: 1px solid #f9f9f9;
         }
-        .regalo-recibido-item:last-child { border-bottom: none; }
+        .img-regalo-mini { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; background: #eee; }
 
-        /* --- GRID DE REGALOS (INVENTARIO) --- */
-        .inventario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .item-card { background: var(--fondo-marfil); padding: 10px; border-radius: 10px; text-align: center; }
-        .item-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+        /* --- LISTADO DE DESEOS (INVENTARIO) --- */
+        .inventario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .item-card { background: var(--fondo-marfil); padding: 15px; border-radius: 12px; text-align: center; position: relative; }
+        .item-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        .badge-stock { 
+            position: absolute; top: 10px; right: 10px; background: var(--azul-profundo); 
+            color: white; padding: 4px 8px; border-radius: 5px; font-size: 0.7rem; 
+        }
 
         @media (max-width: 900px) {
             .sidebar { display: none; }
@@ -121,7 +125,6 @@
             <span id="id-mesa-badge" style="background: var(--dorado); color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">ID: ---</span>
         </div>
 
-        <!-- 1. RESUMEN DE DINERO Y REGALOS -->
         <div class="stats-grid">
             <div class="card-stats">
                 <h3>Total Recaudado</h3>
@@ -133,26 +136,26 @@
             </div>
         </div>
 
-        <!-- 2. MURO DE REGALOS RECIBIDOS (NUEVO) -->
+        <!-- MURO DE ACTIVIDAD VISUAL -->
         <div class="panel-section">
-            <h3>Actividad Reciente</h3>
+            <h3>Actividad Reciente (Quién regaló qué)</h3>
             <div id="muro-actividad">
                 <p style="color: var(--gris-azul); text-align: center;">Buscando regalos recibidos...</p>
             </div>
         </div>
 
-        <!-- 3. GESTOR DE INVENTARIO -->
+        <!-- GESTOR DE INVENTARIO CON STOCK -->
         <div class="panel-section">
             <h3>Añadir Nuevo Regalo a la Lista</h3>
             <div class="grid-form">
-                <input type="text" id="add-nombre" placeholder="Producto (ej: Cafetera)">
+                <input type="text" id="add-nombre" placeholder="¿Qué es? (ej: Licuadora)">
                 <input type="number" id="add-precio" placeholder="Precio MXN">
-                <input type="text" id="add-imagen" placeholder="URL de la imagen">
+                <input type="text" id="add-imagen" placeholder="URL de la imagen (Link)">
+                <input type="number" id="add-cantidad" placeholder="¿Cuántos? (Stock)" value="1">
             </div>
-            <button class="btn-add" onclick="subirNuevoProducto()">Guardar Producto</button>
+            <button class="btn-add" onclick="subirNuevoProducto()">Guardar en mi Lista</button>
         </div>
 
-        <!-- 4. VISTA PREVIA DE TU LISTA -->
         <div class="panel-section">
             <h3>Mi Lista de Deseos</h3>
             <div class="inventario-grid" id="inventario-lista">
@@ -162,7 +165,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN OFICIAL ODARA-15D63
         const firebaseConfig = {
             apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
             authDomain: "odara-15d63.firebaseapp.com",
@@ -179,7 +181,6 @@
 
         let mesaIdGlobal = "";
 
-        // CONTROL DE ACCESO
         auth.onAuthStateChanged(user => {
             if (user) {
                 obtenerDatosMesa(user.uid);
@@ -205,25 +206,22 @@
             });
         }
 
-        // FUNCIÓN CLAVE: Ver quién regaló
+        // CARGAR REGALOS RECIBIDOS (VERSIÓN VISUAL)
         function cargarRegalosRecibidos() {
             const muro = document.getElementById('muro-actividad');
             const txtMonto = document.getElementById('total-monto');
             const txtCant = document.getElementById('total-invitados');
             
-            let totalAcumulado = 0;
-            let totalPersonas = 0;
-
             db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos_recibidos")
             .orderBy("fecha", "desc").onSnapshot(snapshot => {
                 if (snapshot.empty) {
-                    muro.innerHTML = "<p style='text-align:center; color:#ccc;'>Aún no tienes regalos registrados.</p>";
+                    muro.innerHTML = "<p style='text-align:center; color:#ccc; padding:20px;'>Aún no tienes regalos. ¡Comparte tu link!</p>";
                     return;
                 }
 
                 muro.innerHTML = "";
-                totalAcumulado = 0;
-                totalPersonas = 0;
+                let totalAcumulado = 0;
+                let totalPersonas = 0;
 
                 snapshot.forEach(doc => {
                     const regalo = doc.data();
@@ -232,12 +230,14 @@
 
                     muro.innerHTML += `
                         <div class="regalo-recibido-item">
-                            <div>
-                                <strong style="color:var(--azul-profundo);">${regalo.nombre_invitado}</strong>
-                                <p style="margin:4px 0; font-size:0.8rem; color:var(--gris-azul);">"${regalo.mensaje}"</p>
+                            <img src="${regalo.producto_imagen || 'https://via.placeholder.com/50'}" class="img-regalo-mini">
+                            <div style="flex-grow: 1;">
+                                <strong style="font-size:0.9rem;">${regalo.nombre_invitado}</strong>
+                                <span style="font-size:0.8rem; color:var(--terracota);"> regaló ${regalo.producto_nombre}</span>
+                                <p style="margin:4px 0 0; font-size:0.75rem; color:var(--gris-azul); font-style:italic;">"${regalo.mensaje}"</p>
                             </div>
                             <div style="text-align:right;">
-                                <span style="color:var(--terracota); font-weight:600;">+$${regalo.monto}</span>
+                                <span style="font-weight:600; color:var(--azul-profundo);">$${regalo.monto}</span>
                             </div>
                         </div>
                     `;
@@ -248,39 +248,44 @@
             });
         }
 
-        // GESTIÓN DE PRODUCTOS
+        // SUBIR PRODUCTO CON LÍMITE (STOCK)
         function subirNuevoProducto() {
             const nombre = document.getElementById('add-nombre').value;
             const precio = document.getElementById('add-precio').value;
             const imagen = document.getElementById('add-imagen').value;
+            const cantidad = document.getElementById('add-cantidad').value;
 
-            if(!nombre || !precio || !imagen) return alert("Llena todos los campos.");
+            if(!nombre || !precio) return alert("Por favor llena el nombre y precio.");
 
             db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos").add({
                 nombre: nombre,
                 precio: Number(precio),
-                imagen: imagen,
+                imagen: imagen || "https://via.placeholder.com/150",
+                cantidad_total: Number(cantidad),
+                cantidad_comprada: 0,
                 creado: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("¡Regalo añadido!");
+                alert("¡Regalo añadido con éxito!");
                 document.getElementById('add-nombre').value = "";
                 document.getElementById('add-precio').value = "";
                 document.getElementById('add-imagen').value = "";
+                document.getElementById('add-cantidad').value = "1";
                 cargarMiInventario();
             });
         }
 
         function cargarMiInventario() {
             const lista = document.getElementById('inventario-lista');
-            db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos").get().then(snapshot => {
+            db.collection("mesas_publicas").doc(mesaIdGlobal).collection("regalos").orderBy("creado", "desc").get().then(snapshot => {
                 lista.innerHTML = "";
                 snapshot.forEach(doc => {
                     const item = doc.data();
                     lista.innerHTML += `
                         <div class="item-card">
+                            <div class="badge-stock">${item.cantidad_comprada} / ${item.cantidad_total} recibidos</div>
                             <img src="${item.imagen}">
-                            <p style="font-size:0.8rem; margin:10px 0 5px;">${item.nombre}</p>
-                            <strong style="color:var(--dorado);">$${item.precio}</strong>
+                            <p style="font-size:0.85rem; font-weight:600; margin:5px 0;">${item.nombre}</p>
+                            <strong style="color:var(--terracota);">$${item.precio} MXN</strong>
                         </div>
                     `;
                 });
