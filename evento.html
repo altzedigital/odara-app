@@ -44,11 +44,12 @@
         </div>
 
         <div id="contenedor-regalos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- Los regalos se cargan aquí -->
         </div>
     </main>
 
     <footer class="py-10 text-center text-gray-400 text-sm tracking-widest uppercase font-light">
-        Odara &copy; 2024 | Experiencias Inolvidables
+        Odara &copy; 2026 | Experiencias Inolvidables
     </footer>
 
     <script type="module">
@@ -68,11 +69,11 @@
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const mesaId = urlParams.get('id');
+        const mesaIdParam = urlParams.get('id'); // Este es el ID de 6 dígitos que viene en la URL
 
-        // LÓGICA DE NEGOCIO: Comisión del 10% cobrada al invitado
+        // LÓGICA DE NEGOCIO: Comisión del 10%
         window.comprarRegalo = function(nombre, precio) {
-            const comision = 0.10; // Tu ganancia
+            const comision = 0.10; 
             const precioOriginal = parseFloat(precio);
             const cargoServicio = precioOriginal * comision;
             const total = precioOriginal + cargoServicio;
@@ -88,46 +89,51 @@
                             `¿Deseas proceder al pago seguro?`;
 
             if (confirm(mensaje)) {
-                // Siguiente fase: Integración de checkout
                 alert("Redirigiendo a pasarela segura por " + fmt(total) + "...");
             }
         };
 
         async function cargarEvento() {
-            if (!mesaId) {
-                document.getElementById('nombres-novios').innerText = "ID de Mesa no válido";
+            if (!mesaIdParam) {
+                document.getElementById('nombres-novios').innerText = "Mesa no especificada";
                 return;
             }
 
             try {
-                const q = query(collection(db, "mesas"), where("id_mesa", "==", parseInt(mesaId)));
+                // CAMBIO: Buscamos en 'mesas_publicas' por el campo 'id_mesa' (Number)
+                const q = query(collection(db, "mesas_publicas"), where("id_mesa", "==", parseInt(mesaIdParam)));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
                     const docMesa = querySnapshot.docs[0];
                     const datosMesa = docMesa.data();
 
-                    document.getElementById('nombres-novios').innerText = datosMesa.nombres || "Nuestra Boda";
-                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje || "Gracias por acompañarnos.";
+                    // Ajuste de nombres de campos según tu nuevo registro
+                    document.getElementById('nombres-novios').innerText = datosMesa.nombres || "Nuestro Evento";
+                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje_bienvenida || "Gracias por ser parte de nuestra historia.";
 
+                    // Cargamos los regalos usando el ID real del documento (el UID)
                     cargarRegalos(docMesa.id);
                 } else {
                     document.getElementById('nombres-novios').innerText = "Mesa no encontrada";
+                    document.getElementById('mensaje-bienvenida').innerText = "Por favor verifica el código enviado por los anfitriones.";
                 }
             } catch (error) {
                 console.error("Error al cargar:", error);
+                document.getElementById('nombres-novios').innerText = "Error de conexión";
             }
         }
 
         async function cargarRegalos(docIdInterno) {
             const container = document.getElementById('contenedor-regalos');
-            const regalosRef = collection(db, "mesas", docIdInterno, "regalos");
+            // CAMBIO: Colección correcta 'mesas_publicas'
+            const regalosRef = collection(db, "mesas_publicas", docIdInterno, "regalos");
             const snapshot = await getDocs(regalosRef);
 
             container.innerHTML = "";
 
             if (snapshot.empty) {
-                container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Aún no se han añadido regalos a esta lista.</p>";
+                container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Los anfitriones aún no han añadido regalos.</p>";
                 return;
             }
 
@@ -136,7 +142,7 @@
                 container.innerHTML += `
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 group transition-all duration-300 hover:shadow-2xl">
                         <div class="relative overflow-hidden h-72">
-                            <img src="${regalo.foto}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${regalo.nombre}">
+                            <img src="${regalo.foto || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${regalo.nombre}">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all"></div>
                         </div>
                         <div class="p-8 text-center">
