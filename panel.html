@@ -148,10 +148,32 @@
 </div>
 
 <script>
-    // Aquí irá la lógica que hicimos anteriormente para:
-    // 1. Leer el catálogo de Firebase (colección catalogo_maestro)
-    // 2. Generar estas tarjetas dinámicamente
-    // 3. Guardar el precio que la usuaria edite
+    // 1. Configura tu Firebase (asegúrate de tener cargada la librería de Firebase en el head)
+const db = firebase.firestore();
+
+// 2. Referencia al contenedor donde se mostrarán los productos
+const contenedor = document.getElementById('contenedor-productos');
+
+// 3. Función para cargar el catálogo
+// NOTA: Aquí usamos "baby_shower" como ejemplo, luego lo haremos dinámico
+function cargarCatalogo() {
+    db.collection("catalogo_maestro").doc("baby_shower").get().then((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            const productos = data.productos; // Este es tu array que creaste
+            
+            // Limpiamos el contenedor por si acaso
+            contenedor.innerHTML = '';
+
+            // 4. Recorremos cada producto para crear su tarjeta
+            productos.forEach((prod, index) => {
+                crearTarjeta(prod, index);
+            });
+        } else {
+            console.log("No se encontró el catálogo");
+        }
+    });
+}
 </script>
 
 </body>
