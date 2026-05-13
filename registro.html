@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear mi Mesa - Odara</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- SDK de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --fondo-marfil: #FAF7F2;
@@ -26,7 +32,6 @@
             min-height: 100vh;
         }
 
-        /* HEADER SIMPLE PARA REGISTRO */
         header { 
             padding: 20px 5%; 
             text-align: center; 
@@ -35,7 +40,6 @@
         }
         .logo { max-width: 80px; }
 
-        /* CONTENEDOR PRINCIPAL */
         .main-auth {
             flex: 1;
             display: flex;
@@ -58,7 +62,6 @@
         .auth-header h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--azul-profundo); }
         .auth-header p { color: var(--gris-azul); font-size: 0.9rem; }
 
-        /* FORMULARIO */
         .form-group { margin-bottom: 20px; }
         label { 
             display: block; 
@@ -118,7 +121,6 @@
             font-weight: 600;
         }
 
-        /* DETALLE DECORATIVO */
         .decor {
             width: 40px;
             height: 2px;
@@ -145,8 +147,8 @@
 
         <form id="registro-form">
             <div class="form-group">
-                <label>Nombre Completo</label>
-                <input type="text" id="nombre" class="input-auth" placeholder="Ej. Ana García" required>
+                <label>Nombre del Evento (o nombre de los festejados)</label>
+                <input type="text" id="nombre-evento" class="input-auth" placeholder="Ej. Boda de Ana y Juan" required>
             </div>
 
             <div class="form-group">
@@ -182,6 +184,85 @@
 <footer style="background: var(--azul-profundo); padding: 20px; text-align: center; color: var(--fondo-marfil); font-size: 0.7rem;">
     © 2026 Odara. Elegancia en cada detalle.
 </footer>
+
+<script>
+    // Configuración de tu Firebase (Pega aquí tus credenciales reales)
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_DOMINIO.firebaseapp.com",
+        projectId: "TU_PROJECT_ID",
+        storageBucket: "TU_BUCKET.appspot.com",
+        messagingSenderId: "TU_SENDER_ID",
+        appId: "TU_APP_ID"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Función para convertir "Boda de Ana" en "boda-de-ana" (ID Amigable)
+    function generarIDAmigable(texto) {
+        return texto
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')      
+            .replace(/[^\w\-]+/g, '')   
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')         
+            .replace(/-+$/, '');
+    }
+
+    // Lógica del Formulario
+    document.getElementById('registro-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombreEventoOriginal = document.getElementById('nombre-evento').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const tipoEvento = document.getElementById('tipo-evento').value;
+
+        try {
+            // 1. Crear usuario en Firebase Auth
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // 2. Generar datos automáticos para la Mesa
+            const idMesaAmigable = generarIDAmigable(nombreEventoOriginal);
+            const numeroEvento = Math.floor(10000 + Math.random() * 90000); // 5 dígitos
+
+            // 3. Crear el Documento en 'mesas_publicas' de forma automática
+            // Usamos el idMesaAmigable como el Nombre del Documento
+            await db.collection("mesas_publicas").doc(idMesaAmigable).set({
+                numero_evento: numeroEvento,
+                nombre_evento: nombreEventoOriginal,
+                tipo_evento: tipoEvento,
+                anfitrion_email: email,
+                anfitrion_uid: user.uid,
+                activa: true,
+                mensaje_bienvenida: `¡Bienvenidos a nuestro ${tipoEvento}!`,
+                fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 4. Guardar perfil básico del usuario
+            await db.collection("usuarios").doc(user.uid).set({
+                email: email,
+                id_mesa: idMesaAmigable,
+                numero_evento: numeroEvento
+            });
+
+            alert(`¡Cuenta creada con éxito!\nTu número de evento es: ${numeroEvento}\nTu link es: odara.mx/${idMesaAmigable}`);
+            
+            // Redirigir al panel
+            window.location.href = "panel.html";
+
+        } catch (error) {
+            console.error("Error en registro: ", error);
+            alert("Error: " + error.message);
+        }
+    });
+</script>
 
 </body>
 </html>
