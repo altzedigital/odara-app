@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestra Mesa de Regalos - Odara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --fondo-marfil: #FAF7F2;
+            --azul-profundo: #102A43;
+            --dorado: #C8A96B;
+            --terracota: #C97B63;
+            --blanco: #ffffff;
+            --gris-suave: #5C6770;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            background-color: var(--fondo-marfil); 
+            color: var(--azul-profundo); 
+        }
+
+        /* --- PORTADA DINÁMICA --- */
+        .hero-mesa {
+            height: 60vh;
+            background: linear-gradient(rgba(16, 42, 67, 0.4), rgba(16, 42, 67, 0.4)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--blanco);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-mesa h1 { font-size: 3rem; margin-bottom: 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); }
+        .hero-mesa p { font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* --- CUENTA REGRESIVA --- */
+        .countdown-container {
+            background: var(--blanco);
+            padding: 30px;
+            width: 80%;
+            max-width: 600px;
+            margin: -50px auto 50px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--dorado);
+        }
+        .time-box { text-align: center; }
+        .time-box span { display: block; font-size: 1.8rem; font-weight: 600; color: var(--terracota); }
+        .time-box label { font-size: 0.7rem; text-transform: uppercase; color: var(--gris-suave); }
+
+        /* --- GRID DE REGALOS --- */
+        .regalos-section { padding: 50px 10%; text-align: center; }
+        .regalos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .gift-card {
+            background: var(--blanco);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: 1px solid #eee;
+        }
+        .gift-card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .gift-img { width: 100%; height: 250px; object-fit: cover; }
+        .gift-info { padding: 20px; }
+        .gift-name { font-weight: 600; margin-bottom: 10px; display: block; }
+        .gift-price { color: var(--terracota); font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: block; }
+        
+        .btn-regalar {
+            background: var(--azul-profundo);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-regalar:hover { background: var(--dorado); }
+
+        @media (max-width: 768px) {
+            .hero-mesa h1 { font-size: 2rem; }
+            .countdown-container { width: 90%; flex-wrap: wrap; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-mesa" id="hero-bg">
+        <p>Bienvenidos a la celebración de</p>
+        <h1 id="nombres-anfitriones">Cargando...</h1>
+        <p id="fecha-evento-texto"></p>
+    </div>
+
+    <div class="countdown-container">
+        <div class="time-box"><span id="days">00</span><label>Días</label></div>
+        <div class="time-box"><span id="hours">00</span><label>Horas</label></div>
+        <div class="time-box"><span id="minutes">00</span><label>Minutos</label></div>
+        <div class="time-box"><span id="seconds">00</span><label>Segundos</label></div>
+    </div>
+
+    <section class="regalos-section">
+        <h2 style="color: var(--azul-profundo);">Nuestra Lista de Deseos</h2>
+        <p style="color: var(--gris-suave);">Tu presencia es nuestro mejor regalo, pero si deseas tener un detalle con nosotros, aquí tienes algunas ideas.</p>
+        
+        <div class="regalos-grid" id="lista-regalos">
+            <!-- Los regalos se cargarán dinámicamente aquí -->
+        </div>
+    </section>
+
+    <script>
+        // Configuración de Firebase (Usa la misma de index.html)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO_ID",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 1. Obtener ID de la URL
+        const params = new URLSearchParams(window.location.search);
+        const mesaId = params.get('id');
+
+        if (!mesaId) {
+            window.location.href = 'index.html';
+        }
+
+        // 2. Cargar Datos del Evento
+        db.collection("mesas_publicas").doc(mesaId).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('nombres-anfitriones').innerText = data.nombres;
+                document.getElementById('fecha-evento-texto').innerText = data.fecha_texto || "";
+                
+                if(data.foto_portada) {
+                    document.getElementById('hero-bg').style.backgroundImage = `linear-gradient(rgba(16,42,67,0.4), rgba(16,42,67,0.4)), url('${data.foto_portada}')`;
+                }
+
+                iniciarCuentaRegresiva(data.fecha_evento);
+                cargarRegalos(mesaId);
+            } else {
+                alert("Mesa no encontrada.");
+            }
+        });
+
+        // 3. Función Cuenta Regresiva
+        function iniciarCuentaRegresiva(fechaFinal) {
+            const destino = new Date(fechaFinal).getTime();
+
+            setInterval(() => {
+                const ahora = new Date().getTime();
+                const diferencia = destino - ahora;
+
+                const d = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+                document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+                document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+                document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+            }, 1000);
+        }
+
+        // 4. Cargar Regalos
+        function cargarRegalos(id) {
+            const contenedor = document.getElementById('lista-regalos');
+            
+            db.collection("mesas_publicas").doc(id).collection("regalos").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const regalo = doc.data();
+                    contenedor.innerHTML += `
+                        <div class="gift-card">
+                            <img src="${regalo.imagen}" class="gift-img" alt="${regalo.nombre}">
+                            <div class="gift-info">
+                                <span class="gift-name">${regalo.nombre}</span>
+                                <span class="gift-price">$${regalo.precio} MXN</span>
+                                <button class="btn-regalar" onclick="regalar('${doc.id}')">Regalar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function regalar(regaloId) {
+            // Aquí conectarás con la pasarela de pago en el siguiente paso
+            alert("¡Gracias por tu intención! Próximamente activaremos la pasarela de pago.");
+        }
+    </script>
+</body>
+</html>
