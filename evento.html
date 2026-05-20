@@ -7,46 +7,80 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #fcfaf7; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #FAF7F2; }
         .font-serif { font-family: 'Cinzel', serif; }
-        .bg-odara-blue { background-color: #001f3f; }
-        .text-odara-gold { color: #c5a059; }
-        .border-odara-gold { border-color: #c5a059; }
+        .bg-odara-blue { background-color: #102A43; }
+        .text-odara-blue { color: #102A43; }
+        .text-odara-gold { color: #C8A96B; }
+        .border-odara-gold { border-color: #C8A96B; }
+        .bg-odara-gold { background-color: #C8A96B; }
+        .text-odara-terracota { color: #C97B63; }
         .btn-gold { 
-            background-color: #c5a059; 
+            background-color: #C8A96B; 
             color: white;
             transition: all 0.3s ease;
         }
         .btn-gold:hover { background-color: #a38445; transform: translateY(-2px); }
+        
+        /* Modal background overlay */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
-    <header class="bg-odara-blue text-white py-20 px-4 text-center shadow-2xl border-b-4 border-odara-gold">
+    <header class="bg-odara-blue text-white py-20 px-4 text-center shadow-2xl border-b-4 border-odara-gold relative">
         <div class="max-w-4xl mx-auto">
-            <h1 id="nombres-novios" class="font-serif text-5xl md:text-7xl mb-6 text-odara-gold tracking-widest uppercase">Cargando...</h1>
+            <h1 id="nombres-novios" class="font-serif text-4xl md:text-6xl mb-6 text-odara-gold tracking-widest uppercase">Cargando...</h1>
             <div class="h-1 w-32 bg-odara-gold mx-auto mb-6"></div>
-            <p class="text-xl opacity-80 italic tracking-widest">Nuestra Mesa de Regalos</p>
+            <p class="text-lg md:text-xl opacity-80 italic tracking-widest uppercase">Nuestra Mesa de Regalos</p>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto py-16 px-6">
-        <section class="text-center mb-20 bg-white p-10 rounded-lg shadow-sm border border-gray-100">
-            <h2 class="font-serif text-3xl mb-6 text-odara-blue">Bienvenidos</h2>
+        <section class="text-center mb-20 bg-white p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="font-serif text-3xl mb-6 text-odara-blue tracking-wide">Bienvenidos</h2>
             <p id="mensaje-bienvenida" class="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed italic">
                 Estamos preparando los detalles de nuestro gran día...
             </p>
         </section>
 
         <div class="flex justify-between items-center mb-12 border-b border-gray-200 pb-4">
-            <h3 class="font-serif text-3xl text-odara-blue">Selección de Regalos</h3>
-            <span class="text-sm text-gray-400 uppercase tracking-widest">Odara Exclusive</span>
+            <h3 class="font-serif text-2xl md:text-3xl text-odara-blue tracking-wide">Selección de Regalos</h3>
+            <span class="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Odara Exclusive</span>
         </div>
 
         <div id="contenedor-regalos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            <!-- Los regalos se cargan aquí -->
-        </div>
+            </div>
     </main>
+
+    <div id="modal-regalo" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden modal-overlay p-4">
+        <div class="bg-[#FAF7F2] rounded-2xl max-w-lg w-full p-8 shadow-2xl border-t-8 border-odara-gold relative">
+            <button onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            
+            <h3 class="font-serif text-2xl text-odara-blue text-center mb-2 uppercase tracking-wide">Acompaña tu Detalle</h3>
+            <p class="text-center text-sm text-gray-500 mb-6">Escribe un lindo mensaje para los festejados</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-odara-blue mb-2">Tu Nombre Completo</label>
+                    <input type="text" id="invitado-nombre" placeholder="Ej. Familia Martínez López" class="w-full p-3 border border-gray-200 rounded-lg outline-none focus:border-odara-gold font-sans bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-odara-blue mb-2">Mensaje o Dedicatoria</label>
+                    <textarea id="invitado-mensaje" rows="4" placeholder="¡Muchas felicidades en esta hermosa etapa! Los queremos mucho..." class="w-full p-3 border border-gray-200 rounded-lg outline-none focus:border-odara-gold font-sans resize-none bg-white"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                <button onclick="procesarIntencionRegalo()" class="btn-gold w-full py-4 rounded-lg uppercase text-xs font-bold tracking-[0.2em] shadow-md">
+                    Continuar al Pago Seguro
+                </button>
+            </div>
+        </div>
+    </div>
 
     <footer class="py-10 text-center text-gray-400 text-sm tracking-widest uppercase font-light">
         Odara &copy; 2026 | Experiencias Inolvidables
@@ -69,30 +103,65 @@
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const mesaIdParam = urlParams.get('id'); // Este es el ID de 6 dígitos que viene en la URL
+        const mesaIdParam = urlParams.get('id'); // ID de la mesa proveniente de la URL (?id=2001)
 
-        // LÓGICA DE NEGOCIO: Comisión del 10%
-        window.comprarRegalo = function(nombre, precio) {
+        // Variables temporales para el flujo del regalo actual seleccionado
+        let regaloSeleccionado = {
+            nombre: "",
+            precio: 0,
+            foto: ""
+        };
+
+        // Función global para abrir el modal de felicitaciones
+        window.abrirModalRegalo = function(nombre, precio, foto) {
+            regaloSeleccionado = { nombre, precio: parseFloat(precio), foto };
+            
+            // Limpiar inputs previos
+            document.getElementById('invitado-nombre').value = "";
+            document.getElementById('invitado-mensaje').value = "";
+            
+            // Mostrar ventana modal
+            document.getElementById('modal-regalo').classList.remove('hidden');
+        };
+
+        // Función global para cerrar el modal
+        window.cerrarModal = function() {
+            document.getElementById('modal-regalo').classList.add('hidden');
+        };
+
+        // LÓGICA DE NEGOCIO: Procesar dedicatoria y desglosar cálculos del 10%
+        window.procesarIntencionRegalo = function() {
+            const nombreInvitado = document.getElementById('invitado-nombre').value.trim();
+            const mensajeInvitado = document.getElementById('invitado-mensaje').value.trim();
+
+            if (!nombreInvitado) {
+                alert("Por favor, introduce tu nombre para saber quién envía el regalo.");
+                return;
+            }
+
             const comision = 0.10; 
-            const precioOriginal = parseFloat(precio);
+            const precioOriginal = regaloSeleccionado.precio;
             const cargoServicio = precioOriginal * comision;
             const total = precioOriginal + cargoServicio;
 
             const fmt = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
 
-            const mensaje = `Detalles de tu regalo:\n\n` +
-                            `Regalo: ${nombre}\n` +
-                            `Precio: ${fmt(precioOriginal)}\n` +
-                            `Cargo por servicio: ${fmt(cargoServicio)}\n` +
-                            `---------------------------\n` +
-                            `Total a pagar: ${fmt(total)}\n\n` +
-                            `¿Deseas proceder al pago seguro?`;
+            const mensajeConfirmacion = `Resumen de tu aportación:\n\n` +
+                                        `De parte de: ${nombreInvitado}\n` +
+                                        `Regalo: ${regaloSeleccionado.nombre}\n` +
+                                        `Monto de regalo: ${fmt(precioOriginal)}\n` +
+                                        `Cargo por servicio (10%): ${fmt(cargoServicio)}\n` +
+                                        `---------------------------\n` +
+                                        `Total final a pagar: ${fmt(total)}\n\n` +
+                                        `¿Deseas proceder a la pasarela de pago seguro?`;
 
-            if (confirm(mensaje)) {
-                alert("Redirigiendo a pasarela segura por " + fmt(total) + "...");
+            if (confirm(mensajeConfirmacion)) {
+                cerrarModal();
+                alert("Simulación de Compra:\n\nRedirigiendo a pasarela bancaria externa segura para procesar los " + fmt(total) + ".\n\nPróximo paso técnico: Conexión con Stripe API.");
             }
         };
 
+        // CARGAR LOS DATOS E INFO DE LA MESA PÚBLICA
         async function cargarEvento() {
             if (!mesaIdParam) {
                 document.getElementById('nombres-novios').innerText = "Mesa no especificada";
@@ -100,7 +169,7 @@
             }
 
             try {
-                // CAMBIO: Buscamos en 'mesas_publicas' por el campo 'id_mesa' (Number)
+                // Buscamos en la colección principal por el 'id_mesa' numérico
                 const q = query(collection(db, "mesas_publicas"), where("id_mesa", "==", parseInt(mesaIdParam)));
                 const querySnapshot = await getDocs(q);
 
@@ -108,55 +177,74 @@
                     const docMesa = querySnapshot.docs[0];
                     const datosMesa = docMesa.data();
 
-                    // Ajuste de nombres de campos según tu nuevo registro
+                    // Seteamos los textos informativos en el HTML
                     document.getElementById('nombres-novios').innerText = datosMesa.nombres || "Nuestro Evento";
-                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje_bienvenida || "Gracias por ser parte de nuestra historia.";
+                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje_bienvenida || "Gracias por acompañarnos y ser parte fundamental de nuestra historia de amor.";
 
-                    // Cargamos los regalos usando el ID real del documento (el UID)
+                    // Cargamos los regalos asociados a la subcolección interna mediante el ID del Documento (UID)
                     cargarRegalos(docMesa.id);
                 } else {
                     document.getElementById('nombres-novios').innerText = "Mesa no encontrada";
-                    document.getElementById('mensaje-bienvenida').innerText = "Por favor verifica el código enviado por los anfitriones.";
+                    document.getElementById('mensaje-bienvenida').innerText = "El código de mesa no coincide con ningún evento activo. Por favor verifica el enlace.";
                 }
             } catch (error) {
-                console.error("Error al cargar:", error);
+                console.error("Error crítico al inicializar el evento:", error);
                 document.getElementById('nombres-novios').innerText = "Error de conexión";
             }
         }
 
+        // CARGAR SUBCOLECCIÓN DE REGALOS DEL ANFITRIÓN
         async function cargarRegalos(docIdInterno) {
             const container = document.getElementById('contenedor-regalos');
-            // CAMBIO: Colección correcta 'mesas_publicas'
+            if(!container) return;
+            
             const regalosRef = collection(db, "mesas_publicas", docIdInterno, "regalos");
             const snapshot = await getDocs(regalosRef);
 
             container.innerHTML = "";
 
             if (snapshot.empty) {
-                container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Los anfitriones aún no han añadido regalos.</p>";
+                container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Los anfitriones se encuentran curando los elementos de su mesa. ¡Vuelve pronto!</p>";
                 return;
             }
 
             snapshot.forEach((doc) => {
                 const regalo = doc.data();
+                const esCompletado = regalo.completado === true;
+
+                // Definimos el botón dinámico dependiendo si ya se compró el regalo o sigue disponible
+                let botonHTML = `
+                    <button onclick="abrirModalRegalo('${regalo.nombre.replace(/'/g, "\\'")}', ${regalo.precio}, '${regalo.foto || ''}')" class="btn-gold w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] shadow-md">
+                        Regalar ahora
+                    </button>
+                `;
+
+                if (esCompletado) {
+                    botonHTML = `
+                        <button disabled class="w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner">
+                            ¡Regalo Recibido! 🎉
+                        </button>
+                    `;
+                }
+
                 container.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 group transition-all duration-300 hover:shadow-2xl">
-                        <div class="relative overflow-hidden h-72">
-                            <img src="${regalo.foto || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${regalo.nombre}">
-                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all"></div>
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 group transition-all duration-300 ${esCompletado ? 'opacity-75' : 'hover:shadow-2xl'}">
+                        <div class="relative overflow-hidden h-72 bg-white">
+                            <img src="${regalo.foto || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover transition-transform duration-500 ${esCompletical ? '' : 'group-hover:scale-110'}" alt="${regalo.nombre}">
+                            ${esCompletado ? '<div class="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-[1px] flex items-center justify-center"><span class="bg-[#C97B63] text-white font-sans text-xs uppercase font-bold tracking-widest px-4 py-2 rounded shadow-md">Consentidos</span></div>' : '<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all"></div>'}
                         </div>
                         <div class="p-8 text-center">
                             <h4 class="font-serif text-2xl mb-3 text-odara-blue uppercase tracking-tighter">${regalo.nombre}</h4>
                             <p class="text-odara-gold font-bold text-xl mb-6 tracking-widest italic">$${Number(regalo.precio).toLocaleString()} MXN</p>
-                            <button onclick="comprarRegalo('${regalo.nombre}', ${regalo.precio})" class="btn-gold w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] shadow-md">
-                                Regalar ahora
-                            </button>
+                            ${botonHTML}
                         </div>
                     </div>
                 `;
             });
         }
 
+        // Ejecutar carga automática al abrir la página
+        var esCompletical = false; // Auxiliar de render
         cargarEvento();
     </script>
 </body>
