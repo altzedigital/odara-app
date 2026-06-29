@@ -19,6 +19,7 @@
             --blanco: #ffffff;
             --gris-azul: #5C6770;
             --beige-arena: #E3D5CA;
+            --verde-exito: #48BB78;
         }
 
         body { 
@@ -56,13 +57,22 @@
         .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
         .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
+        /* GRID DE TARJETAS ANALÍTICAS */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
         .card-stats {
             background: var(--blanco); padding: 25px; border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03); border-left: 5px solid var(--terracota);
         }
-        .card-stats h3 { margin: 0; color: var(--gris-azul); font-size: 0.8rem; text-transform: uppercase; }
-        .card-stats p { font-size: 2rem; font-weight: 600; margin: 10px 0; }
+        .card-stats.dinero { border-left-color: var(--verde-exito); }
+        .card-stats.regalos { border-left-color: var(--dorado); }
+        
+        .card-stats h3 { margin: 0; color: var(--gris-azul); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .card-stats p { font-size: 2.2rem; font-weight: 600; margin: 10px 0; }
 
         .panel-section {
             background: var(--blanco); padding: 30px; border-radius: 15px;
@@ -82,18 +92,19 @@
         }
         .btn-add-item:hover { background: var(--dorado); }
 
-        /* --- MURO DE ACTIVIDAD (REGALOS RECIBIDOS SIN MONTOS) --- */
+        /* --- MURO DE ACTIVIDAD PREMIUM --- */
         .regalo-recibido-item {
             display: flex; align-items: center; gap: 20px;
-            padding: 15px; border-bottom: 1px solid #fcfcfc;
+            padding: 15px; border-bottom: 1px solid #FAF7F2;
+            transition: 0.2s;
         }
+        .regalo-recibido-item:hover { background-color: rgba(200, 169, 107, 0.05); }
         .img-regalo-mini { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #eee; }
         .mensaje-dedicatoria { margin: 5px 0 0; font-size: 0.85rem; color: var(--gris-azul); font-style: italic; }
 
         @media (max-width: 900px) {
             .sidebar { display: none; }
             .main-content { margin-left: 0; width: 100%; }
-            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -116,14 +127,22 @@
         </div>
 
         <div class="stats-grid">
+            <div class="card-stats dinero">
+                <h3>Fondos Recaudados</h3>
+                <p id="total-dinero" style="color: var(--verde-exito);">$0.00 MXN</p>
+            </div>
+            <div class="card-stats regalos">
+                <h3>Regalos Recibidos</h3>
+                <p id="total-regalos" style="color: var(--dorado);">0</p>
+            </div>
             <div class="card-stats">
-                <h3>Invitados que te han consentido</h3>
+                <h3>Invitados que te han Consentido</h3>
                 <p id="total-invitados" style="color: var(--terracota);">0</p>
             </div>
         </div>
 
         <div class="panel-section">
-            <h3>Muro de Agradecimientos (Regalos Recibidos)</h3>
+            <h3>Muro de Felicitaciones e Historias</h3>
             <div id="muro-actividad">
                 <p style="color: var(--gris-azul); text-align: center;">Buscando tus sorpresas...</p>
             </div>
@@ -230,7 +249,6 @@
         // 4. EL BOTÓN MÁGICO: COPIAR DEL CATÁLOGO AL ESPACIO DEL USUARIO (UID)
         async function agregarAMiMesa(userUid, productoId, nombre, precio, foto) {
             try {
-                // Se guarda en: mesas_publicas -> Documento UID -> subcolección 'regalos'
                 await db.collection("mesas_publicas")
                         .doc(userUid)
                         .collection("regalos")
@@ -244,7 +262,7 @@
                         });
 
                 alert(`¡"${nombre}" se ha añadido correctamente a tu lista de deseos!`);
-                cargarMiInventario(userUid); // Refresca tu lista visual al instante
+                cargarMiInventario(userUid); 
 
             } catch (error) {
                 alert("Hubo un problema al agregar el regalo: " + error.message);
@@ -276,10 +294,12 @@
             }).catch(error => console.error("Error al cargar lista de deseos:", error));
         }
 
-        // 6. ESCUCHAR REGALOS RECIBIDOS (SIN EXPANSIÓN DE MONTOS MONETARIOS)
+        // 6. ESCUCHAR REGALOS RECIBIDOS EN TIEMPO REAL (ANALÍTICAS COMPLETAS)
         function escucharRegalosRecibidos(userUid) {
             const muro = document.getElementById('muro-actividad');
             const txtCant = document.getElementById('total-invitados');
+            const txtRegalos = document.getElementById('total-regalos');
+            const txtDinero = document.getElementById('total-dinero');
             if(!muro) return;
 
             db.collection("mesas_publicas")
@@ -290,15 +310,23 @@
                 if (snapshot.empty) {
                     muro.innerHTML = "<p style='text-align:center; color:var(--gris-azul); padding:20px;'>No has recibido regalos todavía. ¡Tus invitados los verán pronto!</p>";
                     txtCant.innerText = "0";
+                    txtRegalos.innerText = "0";
+                    txtDinero.innerText = "$0.00 MXN";
                     return;
                 }
 
                 muro.innerHTML = "";
                 let totalPersonas = 0;
+                let acumuladoDinero = 0;
 
                 snapshot.forEach(doc => {
                     const r = doc.data();
                     totalPersonas++;
+                    
+                    // Sumamos el monto de forma segura convirtiéndolo a número
+                    if (r.monto) {
+                        acumuladoDinero += Number(r.monto);
+                    }
 
                     muro.innerHTML += `
                         <div class="regalo-recibido-item">
@@ -312,7 +340,11 @@
                     `;
                 });
 
+                // Actualizar los elementos visuales del Panel Analítico superior
                 txtCant.innerText = totalPersonas;
+                txtRegalos.innerText = totalPersonas;
+                txtDinero.innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(acumuladoDinero);
+                
             }, error => {
                 console.error("Error en el muro de regalos recibidos: ", error);
             });
