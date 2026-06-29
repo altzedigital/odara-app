@@ -16,7 +16,9 @@
         .border-odara-gold { border-color: #C8A96B; }
     </style>
 </head>
-<body class="min-h-screen pb-12"><header class="bg-white shadow-sm border-b border-gray-100 py-6 px-8 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<body class="min-h-screen pb-12">
+
+    <header class="bg-white shadow-sm border-b border-gray-100 py-6 px-8 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
             <h1 id="titulo-bienvenida" class="font-serif text-2xl text-odara-blue uppercase tracking-widest">Mi Mesa de Regalos</h1>
             <p id="codigo-mesa" class="text-xs text-gray-400 font-semibold tracking-wider uppercase mt-1">Cargando código...</p>
@@ -46,10 +48,10 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">Enlace de la Foto</label>
-                        <input type="url" id="propio-foto" placeholder="https://imagen-ejemplo.com/foto.jpg" class="w-full p-2.5 border border-gray-200 rounded-lg outline-none text-sm focus:border-odara-gold bg-white">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">Subir Foto del Regalo</label>
+                        <input type="file" id="propio-foto-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-odara-blue hover:file:bg-gray-200 cursor-pointer">
                     </div>
-                    <button type="submit" class="w-full bg-odara-blue text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition">Añadir a mi Lista</button>
+                    <button type="submit" id="btn-submit-propio" class="w-full bg-odara-blue text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition disabled:opacity-50">Añadir a mi Lista</button>
                 </form>
             </div>
 
@@ -94,6 +96,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, collection, addDoc, onSnapshot, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Importación de Firebase Storage v10
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
@@ -107,15 +111,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app); // Inicialización del servicio de almacenamiento
 
         let uidUsuarioActual = null;
 
-        // Comprobamos la sesión del usuario
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uidUsuarioActual = user.uid;
                 
-                // Cargar datos de la mesa para dar la bienvenida
                 const docRef = doc(db, "mesas_publicas", user.uid);
                 const docSnap = await getDoc(docRef);
                 
@@ -124,14 +127,12 @@
                     document.getElementById('codigo-mesa').innerText = `Evento Oficial No. ${docSnap.data().id_mesa}`;
                 }
                 
-                // Escuchar en tiempo real los regalos agregados a esta mesa
                 escucharRegalosMesa(user.uid);
             } else {
                 window.location.href = 'registro.html';
             }
         });
 
-        // ESCUCHAR REGALOS AGREGADOS POR LOS NOVIO EN TIEMPO REAL
         function escucharRegalosMesa(uid) {
             const regalosRef = collection(db, "mesas_publicas", uid, "regalos");
             onSnapshot(regalosRef, (snapshot) => {
@@ -166,42 +167,65 @@
             });
         }
 
-        // ACCIÓN: GUARDAR REGALO PERSONALIZADO DESDE EL FORMULARIO
+        // ACCIÓN: SUBIR IMAGEN A STORAGE Y GUARDAR EN FIRESTORE
         document.getElementById('form-regalo-propio').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!uidUsuarioActual) return;
 
+            const btnSubmit = document.getElementById('btn-submit-propio');
             const nombre = document.getElementById('propio-nombre').value.trim();
             const precio = parseFloat(document.getElementById('propio-precio').value);
             const cantidad = parseInt(document.getElementById('propio-cantidad').value);
-            const foto = document.getElementById('propio-foto').value.trim();
+            const archivoFoto = document.getElementById('propio-foto-file').files[0];
+
+            let fotoUrlFinal = ""; // Link por defecto si no suben nada
 
             try {
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = "SUBIENDO IMAGEN...";
+
+                // Si seleccionaron un archivo, lo procesamos y subimos a Firebase Storage
+                if (archivoFoto) {
+                    // Creamos una ruta única: regalos / ID_USUARIO / tiempo_nombre_archivo
+                    const rutaStorage = `regalos/${uidUsuarioActual}/${Date.now()}_${archivoFoto.name}`;
+                    const storageRef = ref(storage, rutaStorage);
+                    
+                    // Subimos los bytes del archivo
+                    await uploadBytes(storageRef, archivoFoto);
+                    // Obtenemos su URL pública segura de descarga
+                    fotoUrlFinal = await getDownloadURL(storageRef);
+                }
+
+                // Guardamos el registro completo en Firestore
                 await addDoc(collection(db, "mesas_publicas", uidUsuarioActual, "regalos"), {
                     nombre: nombre,
                     precio: precio,
                     cantidad_solicitada: cantidad,
                     cantidad_recibida: 0,
-                    foto: foto,
+                    foto: fotoUrlFinal, // El link de Firebase Storage o vacío
                     fecha_agregado: new Date()
                 });
+
                 document.getElementById('form-regalo-propio').reset();
                 document.getElementById('propio-cantidad').value = 1;
             } catch (error) {
-                console.error("Error al añadir el regalo:", error);
+                console.error("Error crítico al subir imagen o guardar regalo:", error);
+                alert("Tuvimos un problema al subir tu archivo. Verifica que la consola de Storage esté activa en modo de prueba.");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "AÑADIR A MI LISTA";
             }
         });
 
-        // ACCIÓN GLOBAL: MANDAR DESDE EL CATÁLOGO PRE-HECHO A LA MESA (EDITABLE MEDIANTE PROMPT)
+        // ACCIÓN DEL CATÁLOGO PRE-HECHO (Sigue usando los links seguros de Unsplash que tú definas)
         window.agregarDesdeCatalogo = async function(nombreSugerido, precioSugerido, fotoSugerida) {
             if (!uidUsuarioActual) return;
 
-            // Le permitimos a los novios personalizar el precio y la cantidad antes de agregarlo!
             const nuevoPrecio = prompt(`¿Quieres cambiar el precio sugerido para "${nombreSugerido}"?`, precioSugerido);
-            if (nuevoPrecio === null) return; // cancelado
+            if (nuevoPrecio === null) return; 
 
             const nuevaCantidad = prompt(`¿Cuántas unidades de "${nombreSugerido}" deseas pedir en tu mesa?`, "1");
-            if (nuevaCantidad === null) return; // cancelado
+            if (nuevaCantidad === null) return; 
 
             try {
                 await addDoc(collection(db, "mesas_publicas", uidUsuarioActual, "regalos"), {
@@ -217,7 +241,6 @@
             }
         };
 
-        // ACCIÓN GLOBAL: ELIMINAR REGALO DE LA LISTA
         window.eliminarRegalo = async function(idRegalo) {
             if (!uidUsuarioActual) return;
             if (confirm("¿Estás seguro de que deseas quitar este regalo de tu mesa?")) {
@@ -225,7 +248,6 @@
             }
         };
 
-        // CERRAR SESIÓN
         document.getElementById('btn-cerrar').addEventListener('click', () => {
             signOut(auth).then(() => window.location.href = 'registro.html');
         });
