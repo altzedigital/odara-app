@@ -208,7 +208,7 @@
             const nombre = document.getElementById('invitado-nombre').value;
             const mensaje = document.getElementById('invitado-mensaje').value;
 
-            if (!nombre) return alert("Por favor, agrega tu nombre.");
+            if (!nombre) return alert("Por favor, dinos quién eres.");
 
             // A. Registrar el regalo recibido
             db.collection("mesas_publicas").doc(mesaId).collection("regalos_recibidos").add({
