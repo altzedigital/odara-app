@@ -3,279 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear mi Mesa - Odara</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <!-- SDK de Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
+    <title>Mesa de Regalos | Odara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --fondo-marfil: #FAF7F2;
-            --azul-profundo: #102A43;
-            --beige-arena: #E9D8C4;
-            --terracota: #C97B63;
-            --gris-azul: #5C6770;
-            --dorado: #C8A96B;
-            --blanco: #ffffff;
+        body { font-family: 'Montserrat', sans-serif; background-color: #FAF7F2; }
+        .font-serif { font-family: 'Cinzel', serif; }
+        .bg-odara-blue { background-color: #102A43; }
+        .text-odara-blue { color: #102A43; }
+        .text-odara-gold { color: #C8A96B; }
+        .border-odara-gold { border-color: #C8A96B; }
+        .bg-odara-gold { background-color: #C8A96B; }
+        .text-odara-terracota { color: #C97B63; }
+        .btn-gold { 
+            background-color: #C8A96B; 
+            color: white;
+            transition: all 0.3s ease;
         }
-
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            background-color: var(--fondo-marfil); 
-            color: var(--azul-profundo); 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header { 
-            padding: 20px 5%; 
-            text-align: center; 
-            background: var(--blanco);
-            border-bottom: 1px solid var(--beige-arena);
-        }
-        .logo { max-width: 80px; }
-
-        .main-auth {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        .auth-card {
-            background: var(--blanco);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(16, 42, 67, 0.05);
-            width: 100%;
-            max-width: 450px;
-            border-top: 5px solid var(--dorado);
-        }
-
-        .auth-header { text-align: center; margin-bottom: 30px; }
-        .auth-header h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--azul-profundo); }
-        .auth-header p { color: var(--gris-azul); font-size: 0.9rem; }
-
-        .form-group { margin-bottom: 20px; }
-        label { 
-            display: block; 
-            font-weight: 600; 
-            font-size: 0.75rem; 
-            color: var(--gris-azul); 
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        .btn-gold:hover { background-color: #a38445; transform: translateY(-2px); }
         
-        .input-auth {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--beige-arena);
-            border-radius: 8px;
-            background-color: var(--fondo-marfil);
-            font-family: inherit;
-            color: var(--azul-profundo);
-            box-sizing: border-box;
-            transition: 0.3s;
-        }
-        .input-auth:focus {
-            outline: none;
-            border-color: var(--terracota);
-            box-shadow: 0 0 0 3px rgba(201, 123, 99, 0.1);
-        }
-
-        .btn-registro {
-            width: 100%;
-            background-color: var(--azul-profundo);
-            color: var(--blanco);
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            letter-spacing: 1px;
-            margin-top: 10px;
-            font-size: 1rem;
-        }
-        .btn-registro:hover {
-            background-color: var(--terracota);
-            transform: translateY(-1px);
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 0.85rem;
-            color: var(--gris-azul);
-        }
-        .auth-footer a {
-            color: var(--terracota);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .decor {
-            width: 40px;
-            height: 2px;
-            background: var(--dorado);
-            margin: 20px auto;
+        /* Modal background overlay */
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <a href="index.html">
-        <img src="Gemini_Generated_Image_prfor1prfor1prfo.png" alt="Odara Logo" class="logo">
-    </a>
-</header>
+    <header class="bg-odara-blue text-white py-20 px-4 text-center shadow-2xl border-b-4 border-odara-gold relative">
+        <div class="max-w-4xl mx-auto">
+            <h1 id="nombres-novios" class="font-serif text-4xl md:text-6xl mb-6 text-odara-gold tracking-widest uppercase">Cargando...</h1>
+            <div class="h-1 w-32 bg-odara-gold mx-auto mb-6"></div>
+            <p class="text-lg md:text-xl opacity-80 italic tracking-widest uppercase">Nuestra Mesa de Regalos</p>
+        </div>
+    </header>
 
-<main class="main-auth">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h2>Únete a Odara</h2>
-            <p>Comienza a crear una experiencia inolvidable para tu evento.</p>
-            <div class="decor"></div>
+    <main class="max-w-7xl mx-auto py-16 px-6">
+        <section class="text-center mb-20 bg-white p-10 rounded-xl shadow-sm border border-gray-100">
+            <h2 class="font-serif text-3xl mb-6 text-odara-blue tracking-wide">Bienvenidos</h2>
+            <p id="mensaje-bienvenida" class="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed italic">
+                Estamos preparando los detalles de nuestro gran día...
+            </p>
+        </section>
+
+        <div class="flex justify-between items-center mb-12 border-b border-gray-200 pb-4">
+            <h3 class="font-serif text-2xl md:text-3xl text-odara-blue tracking-wide">Selección de Regalos</h3>
+            <span class="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Odara Exclusive</span>
         </div>
 
-        <form id="registro-form">
-            <div class="form-group">
-                <label>Nombre del Evento (o festejados)</label>
-                <input type="text" id="nombre-evento" class="input-auth" placeholder="Ej. Boda de Ana y Juan" required>
+        <div id="contenedor-regalos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            </div>
+    </main>
+
+    <div id="modal-regalo" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden modal-overlay p-4">
+        <div class="bg-[#FAF7F2] rounded-2xl max-w-lg w-full p-8 shadow-2xl border-t-8 border-odara-gold relative">
+            <button onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            
+            <h3 class="font-serif text-2xl text-odara-blue text-center mb-2 uppercase tracking-wide">Acompaña tu Detalle</h3>
+            <p class="text-center text-sm text-gray-500 mb-6">Escribe un lindo mensaje para los festejados</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-odara-blue mb-2">Tu Nombre Completo</label>
+                    <input type="text" id="invitado-nombre" placeholder="Ej. Familia Martínez López" class="w-full p-3 border border-gray-200 rounded-lg outline-none focus:border-odara-gold font-sans bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-odara-blue mb-2">Mensaje o Dedicatoria</label>
+                    <textarea id="invitado-mensaje" rows="4" placeholder="¡Muchas felicidades en esta hermosa etapa! Los queremos mucho..." class="w-full p-3 border border-gray-200 rounded-lg outline-none focus:border-odara-gold font-sans resize-none bg-white"></textarea>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Correo Electrónico</label>
-                <input type="email" id="email" class="input-auth" placeholder="tu@email.com" required>
+            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                <button onclick="procesarIntencionRegalo()" class="btn-gold w-full py-4 rounded-lg uppercase text-xs font-bold tracking-[0.2em] shadow-md">
+                    Continuar al Pago Seguro
+                </button>
             </div>
-
-            <div class="form-group">
-                <label>Contraseña</label>
-                <input type="password" id="password" class="input-auth" placeholder="Mínimo 6 caracteres" required>
-            </div>
-
-            <div class="form-group">
-                <label>Tipo de Evento</label>
-                <select id="tipo-evento" class="input-auth" required>
-                    <option value="" disabled selected>Selecciona una opción</option>
-                    <option value="baby-shower">Baby Shower</option>
-                    <option value="boda">Boda</option>
-                    <option value="cumpleaños">Cumpleaños</option>
-                    <option value="otro">Otro Momento Especial</option>
-                </select>
-            </div>
-
-            <button type="submit" id="btn-submit" class="btn-registro">CREAR MI CUENTA</button>
-        </form>
-
-        <div class="auth-footer">
-            ¿Ya tienes una cuenta? <a href="login.html">Inicia Sesión aquí</a>
         </div>
     </div>
-</main>
 
-<footer style="background: var(--azul-profundo); padding: 20px; text-align: center; color: var(--fondo-marfil); font-size: 0.7rem;">
-    © 2026 Odara. Elegancia en cada detalle.
-</footer>
+    <footer class="py-10 text-center text-gray-400 text-sm tracking-widest uppercase font-light">
+        Odara &copy; 2026 | Experiencias Inolvidables
+    </footer>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
-        authDomain: "odara-15d63.firebaseapp.com",
-        projectId: "odara-15d63",
-        storageBucket: "odara-15d63.firebasestorage.app",
-        messagingSenderId: "574365543873",
-        appId: "1:574365543873:web:d55ad62b17231e39e89340",
-        measurementId: "G-0LYV3GE6KK"
-    };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, onSnapshot, addDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
+            authDomain: "odara-15d63.firebaseapp.com",
+            projectId: "odara-15d63",
+            storageBucket: "odara-15d63.firebasestorage.app",
+            messagingSenderId: "574365543873",
+            appId: "1:574365543873:web:d55ad62b17231e39e89340"
+        };
 
-    // 1. FUNCIÓN PARA GENERAR ID DE 6 DÍGITOS ÚNICO
-    async function generarIDMesaUnico() {
-        let idGenerado;
-        let existe = true;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        while (existe) {
-            idGenerado = Math.floor(100000 + Math.random() * 900000);
-            const snapshot = await db.collection("mesas_publicas")
-                                     .where("id_mesa", "==", idGenerado)
-                                     .get();
-            if (snapshot.empty) {
-                existe = false; 
+        const urlParams = new URLSearchParams(window.location.search);
+        const mesaIdParam = urlParams.get('id'); // ID numérico de la mesa obtenido de la URL (?id=2001)
+
+        // Variables de control global
+        let docIdInternoMesa = null; // Guardará el ID real del documento en Firestore
+        let regaloSeleccionado = {
+            id: "",
+            nombre: "",
+            precio: 0,
+            foto: ""
+        };
+
+        // Función global para abrir el modal
+        window.abrirModalRegalo = function(id, nombre, precio, foto) {
+            regaloSeleccionado = { id, nombre, precio: parseFloat(precio), foto };
+            
+            // Limpiar inputs previos
+            document.getElementById('invitado-nombre').value = "";
+            document.getElementById('invitado-mensaje').value = "";
+            
+            // Mostrar ventana modal
+            document.getElementById('modal-regalo').classList.remove('hidden');
+        };
+
+        // Función global para cerrar el modal
+        window.cerrarModal = function() {
+            document.getElementById('modal-regalo').classList.add('hidden');
+        };
+
+        // Procesar dedicatoria, desglosar el 10% y escribir en la base de datos
+        window.procesarIntencionRegalo = async function() {
+            const nombreInvitado = document.getElementById('invitado-nombre').value.trim();
+            const mensajeInvitado = document.getElementById('invitado-mensaje').value.trim();
+
+            if (!nombreInvitado) {
+                alert("Por favor, introduce tu nombre para saber quién envía el regalo.");
+                return;
+            }
+
+            const comision = 0.10; 
+            const precioOriginal = regaloSeleccionado.precio;
+            const cargoServicio = precioOriginal * comision;
+            const total = precioOriginal + cargoServicio;
+
+            const fmt = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
+
+            const mensajeConfirmacion = `Resumen de tu aportación:\n\n` +
+                                        `De parte de: ${nombreInvitado}\n` +
+                                        `Regalo: ${regaloSeleccionado.nombre}\n` +
+                                        `Monto de regalo: ${fmt(precioOriginal)}\n` +
+                                        `Cargo por servicio (10%): ${fmt(cargoServicio)}\n` +
+                                        `---------------------------\n` +
+                                        `Total final a pagar: ${fmt(total)}\n\n` +
+                                        `¿Deseas proceder a la pasarela de pago seguro?`;
+
+            if (confirm(mensajeConfirmacion)) {
+                try {
+                    // 1. Guardar la dedicatoria en la subcolección 'regalos_recibidos'
+                    const recibidosRef = collection(db, "mesas_publicas", docIdInternoMesa, "regalos_recibidos");
+                    await addDoc(recibidosRef, {
+                        nombre_invitado: nombreInvitado,
+                        mensaje: mensajeInvitado || "¡Muchas felicidades!",
+                        producto_nombre: regaloSeleccionado.nombre,
+                        producto_imagen: regaloSeleccionado.foto || "https://via.placeholder.com/150",
+                        monto: precioOriginal,
+                        fecha: serverTimestamp()
+                    });
+
+                    // 2. Incrementar atómicamente 'cantidad_comprada' en la base de datos
+                    const productoRef = doc(db, "mesas_publicas", docIdInternoMesa, "regalos", regaloSeleccionado.id);
+                    await updateDoc(productoRef, {
+                        cantidad_comprada: increment(1)
+                    });
+
+                    cerrarModal();
+                    alert("Simulación de Compra Exitosa:\n\n¡Gracias por tu regalo! Los fondos han sido simulados de forma segura.\n\nPróximo paso en producción: Redirección Stripe API con total de " + fmt(total));
+                } catch (error) {
+                    console.error("Error al registrar el regalo:", error);
+                    alert("Tuvimos un problema al guardar tu regalo. Inténtalo de nuevo.");
+                }
+            }
+        };
+
+        // Cargar los datos informativos generales de la mesa
+        async function cargarEvento() {
+            if (!mesaIdParam) {
+                document.getElementById('nombres-novios').innerText = "Mesa no especificada";
+                return;
+            }
+
+            try {
+                // Buscamos el evento usando el campo id_mesa
+                const q = query(collection(db, "mesas_publicas"), where("id_mesa", "==", parseInt(mesaIdParam)));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const docMesa = querySnapshot.docs[0];
+                    docIdInternoMesa = docMesa.id; // Guardamos el identificador único para las subcolecciones
+                    const datosMesa = docMesa.data();
+
+                    // Renderizar textos principales
+                    document.getElementById('nombres-novios').innerText = datosMesa.nombres || "Nuestro Evento";
+                    document.getElementById('mensaje-bienvenida').innerText = datosMesa.mensaje_bienvenida || "Gracias por acompañarnos y ser parte fundamental de nuestra historia.";
+
+                    // Escuchar los regalos en tiempo real usando onSnapshot
+                    escucharRegalos();
+                } else {
+                    document.getElementById('nombres-novios').innerText = "Mesa no encontrada";
+                    document.getElementById('mensaje-bienvenida').innerText = "El código de mesa no coincide con ningún evento activo.";
+                }
+            } catch (error) {
+                console.error("Error crítico al inicializar el evento:", error);
+                document.getElementById('nombres-novios').innerText = "Error de conexión";
             }
         }
-        return idGenerado;
-    }
 
-    // 2. FUNCIÓN PARA EL SLUG (URL AMIGABLE)
-    function generarIDAmigable(texto) {
-        return texto.toString().toLowerCase().trim()
-            .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
-    }
+        // Escuchar la subcolección de regalos en TIEMPO REAL
+        function escucharRegalos() {
+            const container = document.getElementById('contenedor-regalos');
+            if (!container) return;
 
-    // 3. LÓGICA DEL FORMULARIO
-    document.getElementById('registro-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-submit');
-        btn.innerText = "CREANDO...";
-        btn.disabled = true;
+            const regalosRef = collection(db, "mesas_publicas", docIdInternoMesa, "regalos");
 
-        const nombreEventoOriginal = document.getElementById('nombre-evento').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const tipoEvento = document.getElementById('tipo-evento').value;
+            // onSnapshot mantendrá la lista actualizada de inmediato si cambia el stock
+            onSnapshot(regalosRef, (snapshot) => {
+                container.innerHTML = "";
 
-        try {
-            // A. Crear usuario en Auth
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
+                if (snapshot.empty) {
+                    container.innerHTML = "<p class='text-center col-span-full text-gray-400 text-lg italic py-10'>Los anfitriones se encuentran curando los elementos de su mesa. ¡Vuelve pronto!</p>";
+                    return;
+                }
 
-            // B. Generar ID de 6 dígitos único
-            const idMesaNumerico = await generarIDMesaUnico();
-            const slugAmigable = generarIDAmigable(nombreEventoOriginal);
+                snapshot.forEach((docSnap) => {
+                    const idProducto = docSnap.id;
+                    const regalo = docSnap.data();
 
-            // C. Crear documento en 'mesas_publicas'
-            // Usamos el UID del usuario como nombre del documento para orden total
-            await db.collection("mesas_publicas").doc(user.uid).set({
-                id_mesa: idMesaNumerico, // El número de 6 dígitos
-                id_amigable: slugAmigable, // Para la URL opcional
-                nombres: nombreEventoOriginal,
-                tipo_evento: tipoEvento,
-                dueno_id: user.uid,
-                email: email,
-                activa: true,
-                fecha_creacion: firebase.firestore.FieldValue.serverTimestamp()
+                    // Lógica para validar el Stock (Cantidad total vs comprada)
+                    const cantidadTotal = regalo.cantidad_total || 1;
+                    const cantidadComprada = regalo.cantidad_comprada || 0;
+                    const disponibles = cantidadTotal - cantidadComprada;
+                    const esAgotado = disponibles <= 0;
+
+                    let botonHTML = "";
+                    let tarjetaOpacidad = "hover:shadow-2xl";
+                    let overlayAgotadoHTML = "";
+
+                    if (esAgotado) {
+                        tarjetaOpacidad = "opacity-75";
+                        overlayAgotadoHTML = `
+                            <div class="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-[1px] flex items-center justify-center">
+                                <span class="bg-[#C97B63] text-white font-sans text-xs uppercase font-bold tracking-widest px-4 py-2 rounded shadow-md">
+                                    Consentidos / Completado 🎉
+                                </span>
+                            </div>
+                        `;
+                        botonHTML = `
+                            <button disabled class="w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner">
+                                ¡Regalo Recibido! 🎉
+                            </button>
+                        `;
+                    } else {
+                        botonHTML = `
+                            <button onclick="abrirModalRegalo('${idProducto}', '${regalo.nombre.replace(/'/g, "\\'")}', ${regalo.precio}, '${regalo.foto || ''}')" class="btn-gold w-full py-4 rounded-md uppercase text-xs font-bold tracking-[0.2em] shadow-md">
+                                Regalar ahora (${disponibles} disponibles)
+                            </button>
+                        `;
+                    }
+
+                    container.innerHTML += `
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 group transition-all duration-300 ${tarjetaOpacidad}">
+                            <div class="relative overflow-hidden h-72 bg-white">
+                                <img src="${regalo.foto || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover transition-transform duration-500 ${esAgotado ? '' : 'group-hover:scale-110'}" alt="${regalo.nombre}">
+                                ${overlayAgotadoHTML}
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all"></div>
+                            </div>
+                            <div class="p-8 text-center">
+                                <h4 class="font-serif text-2xl mb-3 text-odara-blue uppercase tracking-tighter">${regalo.nombre}</h4>
+                                <p class="text-odara-gold font-bold text-xl mb-6 tracking-widest italic">$${Number(regalo.precio).toLocaleString()} MXN</p>
+                                ${botonHTML}
+                            </div>
+                        </div>
+                    `;
+                });
             });
-
-            // D. Guardar en colección de usuarios (respaldo)
-            await db.collection("usuarios").doc(user.uid).set({
-                email: email,
-                id_mesa: idMesaNumerico,
-                rol: "anfitrion"
-            });
-
-            alert(`¡Bienvenida a Odara!\nTu número de evento es: ${idMesaNumerico}`);
-            window.location.href = "panel.html";
-
-        } catch (error) {
-            console.error(error);
-            alert("Error: " + error.message);
-            btn.innerText = "CREAR MI CUENTA";
-            btn.disabled = false;
         }
-    });
-</script>
 
+        // Inicializar el evento al cargar la página
+        cargarEvento();
+    </script>
 </body>
 </html>
