@@ -3,356 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Odara</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
+    <title>Mi Panel de Control | Odara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --fondo-marfil: #FAF7F2;
-            --azul-profundo: #102A43;
-            --dorado: #C8A96B;
-            --terracota: #C97B63;
-            --blanco: #ffffff;
-            --gris-azul: #5C6770;
-            --beige-arena: #E3D5CA;
-            --verde-exito: #48BB78;
-        }
-
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            margin: 0; 
-            background-color: var(--fondo-marfil); 
-            display: flex;
-            color: var(--azul-profundo);
-        }
-
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: 260px;
-            background-color: var(--azul-profundo);
-            height: 100vh;
-            color: white;
-            padding: 30px 20px;
-            position: fixed;
-            box-sizing: border-box;
-        }
-        .sidebar h2 { color: var(--dorado); font-size: 1.4rem; letter-spacing: 3px; margin-bottom: 40px; }
-        .nav-links a { 
-            display: block; color: white; text-decoration: none; 
-            padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.9rem; transition: 0.3s;
-        }
-        .nav-links a:hover { color: var(--dorado); }
-        .btn-logout { 
-            margin-top: 50px; background: none; border: 1px solid var(--terracota); 
-            color: var(--terracota); padding: 12px; cursor: pointer; width: 100%;
-            border-radius: 5px; font-weight: 600;
-        }
-
-        /* --- CONTENIDO PRINCIPAL --- */
-        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
-        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        
-        /* GRID DE TARJETAS ANALÍTICAS */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-            gap: 20px; 
-            margin-bottom: 30px; 
-        }
-        .card-stats {
-            background: var(--blanco); padding: 25px; border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03); border-left: 5px solid var(--terracota);
-        }
-        .card-stats.dinero { border-left-color: var(--verde-exito); }
-        .card-stats.regalos { border-left-color: var(--dorado); }
-        
-        .card-stats h3 { margin: 0; color: var(--gris-azul); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .card-stats p { font-size: 2.2rem; font-weight: 600; margin: 10px 0; }
-
-        .panel-section {
-            background: var(--blanco); padding: 30px; border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03); margin-bottom: 30px;
-        }
-        .panel-section h3 { margin-top: 0; border-bottom: 1px solid var(--fondo-marfil); padding-bottom: 15px; font-size: 1.1rem; }
-
-        /* --- GRID DE CONTENEDORES --- */
-        .inventario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .item-card { background: var(--fondo-marfil); padding: 20px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .item-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
-        
-        .btn-add-item {
-            background: var(--azul-profundo); color: white; border: none;
-            padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;
-            margin-top: 10px; transition: 0.3s; font-family: 'Montserrat'; font-size: 0.85rem;
-        }
-        .btn-add-item:hover { background: var(--dorado); }
-
-        /* --- MURO DE ACTIVIDAD PREMIUM --- */
-        .regalo-recibido-item {
-            display: flex; align-items: center; gap: 20px;
-            padding: 15px; border-bottom: 1px solid #FAF7F2;
-            transition: 0.2s;
-        }
-        .regalo-recibido-item:hover { background-color: rgba(200, 169, 107, 0.05); }
-        .img-regalo-mini { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #eee; }
-        .mensaje-dedicatoria { margin: 5px 0 0; font-size: 0.85rem; color: var(--gris-azul); font-style: italic; }
-
-        @media (max-width: 900px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; width: 100%; }
-        }
+        body { font-family: 'Montserrat', sans-serif; background-color: #FAF7F2; }
+        .font-serif { font-family: 'Cinzel', serif; }
+        .bg-odara-blue { background-color: #102A43; }
+        .text-odara-blue { color: #102A43; }
+        .bg-odara-gold { background-color: #C8A96B; }
+        .text-odara-gold { color: #C8A96B; }
+        .border-odara-gold { border-color: #C8A96B; }
     </style>
 </head>
-<body>
-
-    <div class="sidebar">
-        <h2>ODARA</h2>
-        <div class="nav-links">
-            <a href="#">Panel Principal</a>
-            <a href="#" id="btn-ver-mesa" target="_blank">Ver mi Mesa Pública</a>
-            <a href="#">Configuración</a>
+<body class="min-h-screen pb-12"><header class="bg-white shadow-sm border-b border-gray-100 py-6 px-8 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 id="titulo-bienvenida" class="font-serif text-2xl text-odara-blue uppercase tracking-widest">Mi Mesa de Regalos</h1>
+            <p id="codigo-mesa" class="text-xs text-gray-400 font-semibold tracking-wider uppercase mt-1">Cargando código...</p>
         </div>
-        <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </div>
+        <button id="btn-cerrar" class="text-xs font-semibold uppercase tracking-wider text-red-500 hover:text-red-700 transition">Cerrar Sesión</button>
+    </header>
 
-    <div class="main-content">
-        <div class="header-panel">
-            <h1 id="txt-bienvenida">Bienvenida</h1>
-            <span id="id-mesa-badge" style="background: var(--dorado); color: white; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">ID: ---</span>
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-1 space-y-6">
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-odara-gold">
+                <h2 class="font-serif text-lg text-odara-blue uppercase tracking-wider mb-4">Crear Regalo Propio</h2>
+                <form id="form-regalo-propio" class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">Nombre del Regalo</label>
+                        <input type="text" id="propio-nombre" required placeholder="Ej. Cafetera Espresso Premium" class="w-full p-2.5 border border-gray-200 rounded-lg outline-none text-sm focus:border-odara-gold bg-white">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">Precio ($ MXN)</label>
+                            <input type="number" id="propio-precio" required placeholder="2500" class="w-full p-2.5 border border-gray-200 rounded-lg outline-none text-sm focus:border-odara-gold bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">¿Cuántos deseas?</label>
+                            <input type="number" id="propio-cantidad" value="1" min="1" required class="w-full p-2.5 border border-gray-200 rounded-lg outline-none text-sm text-center focus:border-odara-gold bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">Enlace de la Foto</label>
+                        <input type="url" id="propio-foto" placeholder="https://imagen-ejemplo.com/foto.jpg" class="w-full p-2.5 border border-gray-200 rounded-lg outline-none text-sm focus:border-odara-gold bg-white">
+                    </div>
+                    <button type="submit" class="w-full bg-odara-blue text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition">Añadir a mi Lista</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="font-serif text-lg text-odara-blue uppercase tracking-wider mb-1">Ideas de Regalos</h2>
+                <p class="text-[11px] text-gray-400 uppercase tracking-wide mb-4">Sugeridos por Odara</p>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div class="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=150')"></div>
+                        <div class="flex-grow">
+                            <h4 class="text-xs font-semibold text-gray-700">Fondo Luna de Miel</h4>
+                            <p class="text-[11px] text-odara-gold font-mono font-bold">$10,000 MXN</p>
+                        </div>
+                        <button onclick="agregarDesdeCatalogo('Fondo Luna de Miel', 10000, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600')" class="bg-odara-gold text-white text-[10px] uppercase font-bold px-3 py-2 rounded-md hover:bg-amber-700 transition">+</button>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div class="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1595231712425-60d3ad350243?w=150')"></div>
+                        <div class="flex-grow">
+                            <h4 class="text-xs font-semibold text-gray-700">Cena Romántica</h4>
+                            <p class="text-[11px] text-odara-gold font-mono font-bold">$2,500 MXN</p>
+                        </div>
+                        <button onclick="agregarDesdeCatalogo('Cena Romántica', 2500, 'https://images.unsplash.com/photo-1595231712425-60d3ad350243?w=600')" class="bg-odara-gold text-white text-[10px] uppercase font-bold px-3 py-2 rounded-md hover:bg-amber-700 transition">+</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="stats-grid">
-            <div class="card-stats dinero">
-                <h3>Fondos Recaudados</h3>
-                <p id="total-dinero" style="color: var(--verde-exito);">$0.00 MXN</p>
-            </div>
-            <div class="card-stats regalos">
-                <h3>Regalos Recibidos</h3>
-                <p id="total-regalos" style="color: var(--dorado);">0</p>
-            </div>
-            <div class="card-stats">
-                <h3>Invitados que te han Consentido</h3>
-                <p id="total-invitados" style="color: var(--terracota);">0</p>
+        <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-2xl shadow-md">
+            <h2 class="font-serif text-xl text-odara-blue uppercase tracking-wider mb-6">Mi Lista de Regalos Actual</h2>
+            
+            <div id="contenedor-regalos" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <p class="text-xs text-gray-400 col-span-2 text-center py-8">Aún no has agregado regalos a tu lista.</p>
             </div>
         </div>
 
-        <div class="panel-section">
-            <h3>Muro de Felicitaciones e Historias</h3>
-            <div id="muro-actividad">
-                <p style="color: var(--gris-azul); text-align: center;">Buscando tus sorpresas...</p>
-            </div>
-        </div>
+    </main>
 
-        <div class="panel-section">
-            <h3>Explorar Catálogo Odara</h3>
-            <p style="color: var(--gris-azul); font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">Haz clic para añadir sugerencias exclusivas directamente a tu lista de deseos.</p>
-            <div class="inventario-grid" id="catalogo-maestro-lista">
-                <p style="color: var(--gris-azul); text-align: center; grid-column: 1/-1;">Cargando catálogo...</p>
-            </div>
-        </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, collection, addDoc, onSnapshot, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        <div class="panel-section">
-            <h3>Mi Lista de Deseos Seleccionada</h3>
-            <div class="inventario-grid" id="inventario-lista">
-                <p style="color: var(--gris-azul); text-align: center; grid-column: 1/-1;">Tu lista se encuentra vacía.</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBWnfMUmraJsnu4iPpoSlEJbdsORHWoyH4",
             authDomain: "odara-15d63.firebaseapp.com",
             projectId: "odara-15d63",
             storageBucket: "odara-15d63.firebasestorage.app",
             messagingSenderId: "574365543873",
-            appId: "1:574365543873:web:d55ad62b17231e39e89340",
-            measurementId: "G-0LYV3GE6KK"
+            appId: "1:574365543873:web:d55ad62b17231e39e89340"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        let mesaIdPublico = null; 
+        let uidUsuarioActual = null;
 
-        // 1. GUARDIÁN DE SEGURIDAD DE LA RUTA
-        auth.onAuthStateChanged(user => {
+        // Comprobamos la sesión del usuario
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                obtenerDatosMesa(user.uid);
+                uidUsuarioActual = user.uid;
+                
+                // Cargar datos de la mesa para dar la bienvenida
+                const docRef = doc(db, "mesas_publicas", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    document.getElementById('titulo-bienvenida').innerText = `Mesa de ${docSnap.data().nombres}`;
+                    document.getElementById('codigo-mesa').innerText = `Evento Oficial No. ${docSnap.data().id_mesa}`;
+                }
+                
+                // Escuchar en tiempo real los regalos agregados a esta mesa
+                escucharRegalosMesa(user.uid);
             } else {
-                window.location.href = "login.html";
+                window.location.href = 'registro.html';
             }
         });
 
-        // 2. RECUPERAR DATOS DEL ANFITRIÓN USANDO EL UID AUTOMÁTICO
-        function obtenerDatosMesa(uid) {
-            db.collection("mesas_publicas").where("dueno_id", "==", uid).get()
-            .then(querySnapshot => {
-                if(querySnapshot.empty) {
-                    document.getElementById('txt-bienvenida').innerText = "Mesa no encontrada";
-                    return;
-                }
-                querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    mesaIdPublico = data.id_mesa; 
-                    
-                    document.getElementById('txt-bienvenida').innerText = "Hola, " + (data.nombres || data.nombre);
-                    document.getElementById('id-mesa-badge').innerText = "Mesa ID: " + mesaIdPublico;
-                    document.getElementById('btn-ver-mesa').href = "evento.html?id=" + mesaIdPublico;
+        // ESCUCHAR REGALOS AGREGADOS POR LOS NOVIO EN TIEMPO REAL
+        function escucharRegalosMesa(uid) {
+            const regalosRef = collection(db, "mesas_publicas", uid, "regalos");
+            onSnapshot(regalosRef, (snapshot) => {
+                const contenedor = document.getElementById('contenedor-regalos');
+                contenedor.innerHTML = "";
 
-                    // Desencadenar funciones del ecosistema automático
-                    cargarCatalogoMaestro(uid);
-                    escucharRegalosRecibidos(uid);
-                    cargarMiInventario(uid);
-                });
-            }).catch(error => console.error("Error al obtener datos principales:", error));
-        }
-
-        // 3. CARGAR CATÁLOGO MAESTRO (PROPUESTAS DE ODARA)
-        async function cargarCatalogoMaestro(userUid) {
-            const listaCatalogo = document.getElementById('catalogo-maestro-lista');
-            if(!listaCatalogo) return;
-            listaCatalogo.innerHTML = ""; 
-
-            try {
-                const snapshot = await db.collection("catalogo_maestro").get();
-                if(snapshot.empty) {
-                    listaCatalogo.innerHTML = "<p style='color:var(--gris-azul); text-align:center; grid-column:1/-1;'>No hay productos cargados en el catálogo maestro todavía.</p>";
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    const producto = doc.data();
-                    const productoId = doc.id; 
-
-                    listaCatalogo.innerHTML += `
-                        <div class="item-card">
-                            <img src="${producto.foto || 'https://via.placeholder.com/150'}" alt="${producto.nombre}">
-                            <p style="font-size:0.85rem; font-weight:600; margin:5px 0;">${producto.nombre}</p>
-                            <strong style="color:var(--dorado); font-size:0.9rem;">Precio Sugerido: $${producto.precio_sugerido} MXN</strong>
-                            <button class="btn-add-item" onclick="agregarAMiMesa('${userUid}', '${productoId}', '${producto.nombre}', '${producto.precio_sugerido}', '${producto.foto}')">
-                                Agregar a mi Mesa
-                            </button>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al cargar el catálogo maestro: ", error);
-            }
-        }
-
-        // 4. EL BOTÓN MÁGICO: COPIAR DEL CATÁLOGO AL ESPACIO DEL USUARIO (UID)
-        async function agregarAMiMesa(userUid, productoId, nombre, precio, foto) {
-            try {
-                await db.collection("mesas_publicas")
-                        .doc(userUid)
-                        .collection("regalos")
-                        .doc(productoId) 
-                        .set({
-                            nombre: nombre,
-                            precio: Number(precio),
-                            foto: foto,
-                            completado: false, 
-                            fecha_agregado: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                alert(`¡"${nombre}" se ha añadido correctamente a tu lista de deseos!`);
-                cargarMiInventario(userUid); 
-
-            } catch (error) {
-                alert("Hubo un problema al agregar el regalo: " + error.message);
-            }
-        }
-
-        // 5. CARGAR LA LISTA EXCLUSIVA SELECCIONADA POR EL ANFITRIÓN
-        function cargarMiInventario(userUid) {
-            const lista = document.getElementById('inventario-lista');
-            if(!lista) return;
-
-            db.collection("mesas_publicas").doc(userUid).collection("regalos").get().then(snapshot => {
-                if(snapshot.empty) {
-                    lista.innerHTML = "<p style='color:var(--gris-azul); text-align:center; grid-column:1/-1;'>Aún no has seleccionado regalos del catálogo.</p>";
-                    return;
-                }
-                lista.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const item = doc.data();
-                    lista.innerHTML += `
-                        <div class="item-card">
-                            <img src="${item.foto || 'https://via.placeholder.com/150'}">
-                            <p style="font-size:0.85rem; font-weight:600; margin:5px 0;">${item.nombre}</p>
-                            <strong style="color:var(--terracota);">$${item.precio} MXN</strong>
-                            <p style="font-size:0.75rem; color:var(--gris-azul); margin:5px 0 0;">Estado: ${item.completado ? '✅ Recibido' : '⏳ Disponible'}</p>
-                        </div>
-                    `;
-                });
-            }).catch(error => console.error("Error al cargar lista de deseos:", error));
-        }
-
-        // 6. ESCUCHAR REGALOS RECIBIDOS EN TIEMPO REAL (ANALÍTICAS COMPLETAS)
-        function escucharRegalosRecibidos(userUid) {
-            const muro = document.getElementById('muro-actividad');
-            const txtCant = document.getElementById('total-invitados');
-            const txtRegalos = document.getElementById('total-regalos');
-            const txtDinero = document.getElementById('total-dinero');
-            if(!muro) return;
-
-            db.collection("mesas_publicas")
-            .doc(userUid)
-            .collection("regalos_recibidos")
-            .orderBy("fecha", "desc")
-            .onSnapshot(snapshot => {
                 if (snapshot.empty) {
-                    muro.innerHTML = "<p style='text-align:center; color:var(--gris-azul); padding:20px;'>No has recibido regalos todavía. ¡Tus invitados los verán pronto!</p>";
-                    txtCant.innerText = "0";
-                    txtRegalos.innerText = "0";
-                    txtDinero.innerText = "$0.00 MXN";
+                    contenedor.innerHTML = `<p class="text-xs text-gray-400 col-span-2 text-center py-8">Tu lista está vacía. ¡Agrega tu primer regalo a la izquierda!</p>`;
                     return;
                 }
 
-                muro.innerHTML = "";
-                let totalPersonas = 0;
-                let acumuladoDinero = 0;
-
-                snapshot.forEach(doc => {
-                    const r = doc.data();
-                    totalPersonas++;
-                    
-                    // Sumamos el monto de forma segura convirtiéndolo a número
-                    if (r.monto) {
-                        acumuladoDinero += Number(r.monto);
-                    }
-
-                    muro.innerHTML += `
-                        <div class="regalo-recibido-item">
-                            <img src="${r.regalo_foto || 'https://via.placeholder.com/150'}" class="img-regalo-mini">
-                            <div style="flex-grow: 1;">
-                                <strong style="font-size:0.95rem; color:var(--azul-profundo);">${r.de_parte_de}</strong>
-                                <span style="font-size:0.9rem; color:var(--dorado);"> te obsequió: ${r.regalo_nombre}</span>
-                                <p class="mensaje-dedicatoria">"${r.mensaje || '¡Muchas felicidades!'}"</p>
+                snapshot.forEach((docRegalo) => {
+                    const datos = docRegalo.data();
+                    const card = document.createElement('div');
+                    card.className = "border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white flex flex-col justify-between";
+                    card.innerHTML = `
+                        <div class="h-32 bg-gray-200 bg-cover bg-center" style="background-image: url('${datos.foto || 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500'}')"></div>
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wide truncate">${datos.nombre}</h3>
+                                <p class="text-sm font-mono text-odara-gold font-bold mt-1">$${Number(datos.precio).toLocaleString('es-MX')} MXN</p>
                             </div>
+                            <div class="mt-4 pt-3 border-t border-gray-50 flex justify-between items-center text-[11px] text-gray-500">
+                                <span>Solicitados: <strong>${datos.cantidad_solicitada}</strong></span>
+                                <span>Recibidos: <strong class="text-emerald-600">${datos.cantidad_recibida || 0}</strong></span>
+                            </div>
+                            <button onclick="eliminarRegalo('${docRegalo.id}')" class="w-full text-center text-[10px] text-red-400 uppercase font-semibold tracking-wider mt-3 hover:text-red-600 transition">Eliminar</button>
                         </div>
                     `;
+                    contenedor.appendChild(card);
                 });
-
-                // Actualizar los elementos visuales del Panel Analítico superior
-                txtCant.innerText = totalPersonas;
-                txtRegalos.innerText = totalPersonas;
-                txtDinero.innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(acumuladoDinero);
-                
-            }, error => {
-                console.error("Error en el muro de regalos recibidos: ", error);
             });
         }
 
-        function cerrarSesion() {
-            auth.signOut().then(() => window.location.href = "login.html");
-        }
+        // ACCIÓN: GUARDAR REGALO PERSONALIZADO DESDE EL FORMULARIO
+        document.getElementById('form-regalo-propio').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!uidUsuarioActual) return;
+
+            const nombre = document.getElementById('propio-nombre').value.trim();
+            const precio = parseFloat(document.getElementById('propio-precio').value);
+            const cantidad = parseInt(document.getElementById('propio-cantidad').value);
+            const foto = document.getElementById('propio-foto').value.trim();
+
+            try {
+                await addDoc(collection(db, "mesas_publicas", uidUsuarioActual, "regalos"), {
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad_solicitada: cantidad,
+                    cantidad_recibida: 0,
+                    foto: foto,
+                    fecha_agregado: new Date()
+                });
+                document.getElementById('form-regalo-propio').reset();
+                document.getElementById('propio-cantidad').value = 1;
+            } catch (error) {
+                console.error("Error al añadir el regalo:", error);
+            }
+        });
+
+        // ACCIÓN GLOBAL: MANDAR DESDE EL CATÁLOGO PRE-HECHO A LA MESA (EDITABLE MEDIANTE PROMPT)
+        window.agregarDesdeCatalogo = async function(nombreSugerido, precioSugerido, fotoSugerida) {
+            if (!uidUsuarioActual) return;
+
+            // Le permitimos a los novios personalizar el precio y la cantidad antes de agregarlo!
+            const nuevoPrecio = prompt(`¿Quieres cambiar el precio sugerido para "${nombreSugerido}"?`, precioSugerido);
+            if (nuevoPrecio === null) return; // cancelado
+
+            const nuevaCantidad = prompt(`¿Cuántas unidades de "${nombreSugerido}" deseas pedir en tu mesa?`, "1");
+            if (nuevaCantidad === null) return; // cancelado
+
+            try {
+                await addDoc(collection(db, "mesas_publicas", uidUsuarioActual, "regalos"), {
+                    nombre: nombreSugerido,
+                    precio: parseFloat(nuevoPrecio) || precioSugerido,
+                    cantidad_solicitada: parseInt(nuevaCantidad) || 1,
+                    cantidad_recibida: 0,
+                    foto: fotoSugerida,
+                    fecha_agregado: new Date()
+                });
+            } catch (error) {
+                console.error("Error al copiar del catálogo:", error);
+            }
+        };
+
+        // ACCIÓN GLOBAL: ELIMINAR REGALO DE LA LISTA
+        window.eliminarRegalo = async function(idRegalo) {
+            if (!uidUsuarioActual) return;
+            if (confirm("¿Estás seguro de que deseas quitar este regalo de tu mesa?")) {
+                await deleteDoc(doc(db, "mesas_publicas", uidUsuarioActual, "regalos", idRegalo));
+            }
+        };
+
+        // CERRAR SESIÓN
+        document.getElementById('btn-cerrar').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = 'registro.html');
+        });
     </script>
 </body>
 </html>
